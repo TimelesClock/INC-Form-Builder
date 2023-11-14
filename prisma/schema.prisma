@@ -6,25 +6,67 @@ generator client {
 }
 
 datasource db {
-    provider = "sqlite"
-    // NOTE: When using mysql or sqlserver, uncomment the @db.Text annotations in model Account below
-    // Further reading:
-    // https://next-auth.js.org/adapters/prisma#create-the-prisma-schema
-    // https://www.prisma.io/docs/reference/api-reference/prisma-schema-reference#string
-    url      = env("DATABASE_URL")
+  provider = "cockroachdb"
+  url      = env("DATABASE_URL")
 }
 
-model Post {
-    id        Int      @id @default(autoincrement())
-    name      String
-    createdAt DateTime @default(now())
-    updatedAt DateTime @updatedAt
-
-    createdBy   User   @relation(fields: [createdById], references: [id])
-    createdById String
-
-    @@index([name])
+model Form {
+  id          BigInt       @id @default(autoincrement())
+  title       String
+  description String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  questions   Question[]
 }
+
+model Question {
+  id          BigInt       @id @default(autoincrement())
+  text        String
+  type        QuestionType
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  formId      BigInt
+  answers     Answer[]
+  form        Form      @relation(fields: [formId], references: [id])
+}
+
+enum QuestionType {
+  SHORT_ANSWER
+  PARAGRAPH
+  MULTIPLE_CHOICE
+  CHECKBOXES
+  DROPDOWN
+}
+model Answer {
+  id          BigInt       @id @default(autoincrement())
+  content     String
+  createdAt   DateTime  @default(now())
+  questionId  BigInt
+  question    Question  @relation(fields: [questionId], references: [id])
+
+  @@index([questionId])
+}
+
+
+model FormTemplate {
+  id            BigInt              @id @default(autoincrement())
+  name          String
+  description   String?
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+  templateQuestions TemplateQuestion[]
+}
+
+model TemplateQuestion {
+  id            BigInt              @id @default(autoincrement())
+  text          String
+  type          QuestionType
+  createdAt     DateTime         @default(now())
+  updatedAt     DateTime         @updatedAt
+  formTemplateId BigInt
+  formTemplate  FormTemplate     @relation(fields: [formTemplateId], references: [id])
+}
+
 
 // Necessary for Next auth
 model Account {
@@ -61,7 +103,6 @@ model User {
     image         String?
     accounts      Account[]
     sessions      Session[]
-    posts         Post[]
 }
 
 model VerificationToken {
