@@ -1,5 +1,5 @@
 // components/FormsDisplay.tsx
-import { Button } from "@/components/ui/button";
+
 import { useRouter } from "next/router";
 
 interface Form {
@@ -18,11 +18,11 @@ const FormsDisplay = ({ forms }: FormsDisplayProps) => {
     return (
         <div className="grid grid-cols-3 gap-4 p-4">
             {forms.map((form, index) => (
-                <Button key={index} onClick={()=>{void router.push(`/form/${form.id}`)}}>
+                <button key={index} onClick={()=>{void router.push(`/form/${form.id}`)}}>
                     <div key={index} className="p-4 border border-gray-300 rounded">
                         <h3 className="text-lg font-semibold">{form.title}</h3>
                     </div>
-                </Button>
+                </button>
             ))}
         </div>
     );

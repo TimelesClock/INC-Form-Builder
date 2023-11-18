@@ -2,7 +2,7 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-    provider = "prisma-client-js"
+  provider = "prisma-client-js"
 }
 
 datasource db {
@@ -11,104 +11,97 @@ datasource db {
 }
 
 model Form {
-  id          BigInt       @id @default(autoincrement())
+  id          String       @id @default(cuid())
   title       String
   description String?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  questions   Question[]
-}
-
-model Question {
-  id          BigInt       @id @default(autoincrement())
-  text        String
-  type        QuestionType
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  formId      BigInt
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  owner       User         @relation(fields: [ownerId], references: [id])
+  ownerId     String
   answers     Answer[]
-  form        Form      @relation(fields: [formId], references: [id])
+  question    Json
+  invitations Invitation[]
 }
 
-enum QuestionType {
-  SHORT_ANSWER
-  PARAGRAPH
-  MULTIPLE_CHOICE
-  CHECKBOXES
-  DROPDOWN
-}
 model Answer {
-  id          BigInt       @id @default(autoincrement())
-  content     String
-  createdAt   DateTime  @default(now())
-  questionId  BigInt
-  question    Question  @relation(fields: [questionId], references: [id])
+  id        String   @id @default(cuid())
+  content   Json // Stores the answer content
+  createdAt DateTime @default(now())
+  formId    String
+  form      Form     @relation(fields: [formId], references: [id])
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
 
-  @@index([questionId])
+  @@index([formId])
+  @@index([userId])
 }
 
+model Invitation {
+  id        String   @id @default(cuid())
+  formId    String
+  form      Form     @relation(fields: [formId], references: [id])
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  invitedAt DateTime @default(now())
+
+  @@index([formId])
+  @@index([userId])
+}
 
 model FormTemplate {
-  id            BigInt              @id @default(autoincrement())
-  name          String
-  description   String?
-  createdAt     DateTime         @default(now())
-  updatedAt     DateTime         @updatedAt
-  templateQuestions TemplateQuestion[]
+  id          String   @id @default(cuid())
+  name        String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  question    Json
 }
-
-model TemplateQuestion {
-  id            BigInt              @id @default(autoincrement())
-  text          String
-  type          QuestionType
-  createdAt     DateTime         @default(now())
-  updatedAt     DateTime         @updatedAt
-  formTemplateId BigInt
-  formTemplate  FormTemplate     @relation(fields: [formTemplateId], references: [id])
-}
-
 
 // Necessary for Next auth
 model Account {
-    id                String  @id @default(cuid())
-    userId            String
-    type              String
-    provider          String
-    providerAccountId String
-    refresh_token     String? // @db.Text
-    access_token      String? // @db.Text
-    expires_at        Int?
-    token_type        String?
-    scope             String?
-    id_token          String? // @db.Text
-    session_state     String?
-    user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? // @db.Text
+  access_token      String? // @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? // @db.Text
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-    @@unique([provider, providerAccountId])
+  @@unique([provider, providerAccountId])
 }
 
 model Session {
-    id           String   @id @default(cuid())
-    sessionToken String   @unique
-    userId       String
-    expires      DateTime
-    user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model User {
-    id            String    @id @default(cuid())
-    name          String?
-    email         String?   @unique
-    emailVerified DateTime?
-    image         String?
-    accounts      Account[]
-    sessions      Session[]
+  id            String       @id @default(cuid())
+  name          String?
+  email         String?      @unique
+  emailVerified DateTime?
+  image         String?
+  password      String?
+  accounts      Account[]
+  sessions      Session[]
+  forms         Form[]
+  answers       Answer[]
+  invitations   Invitation[]
 }
 
 model VerificationToken {
-    identifier String
-    token      String   @unique
-    expires    DateTime
+  identifier String
+  token      String   @unique
+  expires    DateTime
 
-    @@unique([identifier, token])
+  @@unique([identifier, token])
 }

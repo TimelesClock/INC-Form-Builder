@@ -1,5 +1,6 @@
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import { type GetServerSidePropsContext } from "next";
+import CredentialsProvider from "next-auth/providers/credentials";
 import {
   getServerSession,
   type DefaultSession,
@@ -9,6 +10,11 @@ import {
 
 import { env } from "~/env.mjs";
 import { db } from "~/server/db";
+
+import bcrypt from 'bcryptjs';
+import { PrismaClient } from "@prisma/client";
+
+const prisma = new PrismaClient();
 
 /**
  * Module augmentation for `next-auth` types. Allows us to add custom properties to the `session`
@@ -45,6 +51,10 @@ export const authOptions: NextAuthOptions = {
         id: user.id,
       },
     }),
+    signIn: async ({ user, account, profile, email, credentials }) => {
+      // Custom logic for sign-in event
+      return true; // Return true to allow the sign-in
+    },
   },
   adapter: PrismaAdapter(db),
   providers: [
@@ -61,6 +71,29 @@ export const authOptions: NextAuthOptions = {
      *
      * @see https://next-auth.js.org/providers/github
      */
+    CredentialsProvider({
+      name: "Credentials",
+      credentials: {
+        email: { label: "Email", type: "text", placeholder: "Email" },
+        password: { label: "Password", type: "password" }
+      },
+      authorize: async (credentials) => {
+
+        if (!credentials) {
+          throw new Error('No credentials provided');
+        }
+
+        const user = await prisma.user.findUnique({
+          where: { email: credentials.email },
+        });
+
+        if (user && bcrypt.compareSync(credentials.password, user.password as string)) {
+          return { id: user.id, name: user.name, email: user.email };
+        } else {
+          throw new Error('Invalid email or password');
+        }
+      }
+    })
   ],
 };
 
