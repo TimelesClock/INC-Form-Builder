@@ -6,6 +6,7 @@ import type { Question, Option } from './StaticForm';
 
 
 
+
 interface SectionProps {
     question: Question;
     answer?: string | string[];
@@ -15,6 +16,7 @@ interface SectionProps {
 const Section: React.FC<SectionProps> = ({ question, answer, editMode }) => {
     //prob not the best coding practice
     let content = null
+    
 
 
     if (question.type === "SHORT_ANSWER") {
@@ -62,10 +64,10 @@ const Section: React.FC<SectionProps> = ({ question, answer, editMode }) => {
                 <div className="space-y-5">
                     {question.options?.map((option, index) => {
                         let props
-                        if(editMode){
-                            props={disabled: editMode}
-                        }else{
-                            props={defaultChecked: answer === option.content}
+                        if (editMode) {
+                            props = { disabled: editMode }
+                        } else {
+                            props = {}
                         }
                         return (
                             <div key={option.id} className="relative flex items-start">
@@ -77,6 +79,7 @@ const Section: React.FC<SectionProps> = ({ question, answer, editMode }) => {
                                         type="checkbox"
                                         className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
                                         value={option.content}
+                                        defaultChecked={answer?.includes(option.content) || false}
                                         {...props}
                                     />
                                 </div>

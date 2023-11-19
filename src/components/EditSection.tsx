@@ -4,6 +4,8 @@ import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid'
 
 import type { Question, Option } from './StaticForm';
 
+import useStore from '~/store/useFormStore';
+
 
 
 interface SectionProps {
@@ -13,19 +15,37 @@ interface SectionProps {
     focused?: boolean;
 }
 
-const EditSection: React.FC<SectionProps> = ({ question, answer, editMode,focused }) => {
+const EditSection: React.FC<SectionProps> = ({ question, answer, editMode, focused }) => {
     //prob not the best coding practice
     let content = null
-    const [title, setTitle] = useState<string>(question.text)
+    const [questions, setQuestions] = useStore((state) => [state.questions, state.setQuestions])
+
     const handleTitleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-        setTitle(event.target.value)
+        const questionIndex = questions.findIndex((q) => q.id === question.id);
+
+        if (questionIndex >= 0) { // Ensure the index is found
+            // Make a copy of the questions array
+            let newQuestions = [...questions];
+        
+            // Check if the question object exists at the found index
+            const questionToUpdate = newQuestions[questionIndex];
+            if (questionToUpdate) {
+                // Update the question's text
+                questionToUpdate.text = event.target.value;
+        
+                // Update the questions array
+                setQuestions(newQuestions);
+            }
+        }
+        
+
     }
 
     if (question.type === "SHORT_ANSWER") {
 
         return (
             <div>
-                <input type="text" onChange={handleTitleChange} defaultValue={title} className="block text-sm font-medium leading-6 text-gray-900 border-none w-full focus:" />
+                <input type="text" onChange={handleTitleChange} defaultValue={question.text} className="block text-sm font-medium leading-6 text-gray-900 border-none w-full focus:" />
                 <div className="mt-2">
                     <input
                         type="text"
@@ -42,7 +62,7 @@ const EditSection: React.FC<SectionProps> = ({ question, answer, editMode,focuse
     } else if (question.type === "PARAGRAPH") {
         return (
             <div>
-                <input type="text" onChange={handleTitleChange} defaultValue={title} className="block text-sm font-medium leading-6 text-gray-900 border-none w-full focus:" />
+                <input type="text" onChange={handleTitleChange} defaultValue={question.text} className="block text-sm font-medium leading-6 text-gray-900 border-none w-full focus:" />
 
                 <div className="mt-2">
                     <textarea
@@ -59,7 +79,7 @@ const EditSection: React.FC<SectionProps> = ({ question, answer, editMode,focuse
     } else if (question.type == "CHECKBOXES") {
         return (
             <fieldset>
-                <input type="text" onChange={handleTitleChange} defaultValue={title} className="block text-sm font-medium leading-6 text-gray-900 border-none w-full focus:" />
+                <input type="text" onChange={handleTitleChange} defaultValue={question.text} className="block text-sm font-medium leading-6 text-gray-900 border-none w-full focus:" />
                 <legend className="sr-only">{question.text}</legend>
                 <div className="space-y-5">
                     {question.options?.map((option, index) => {
@@ -98,7 +118,7 @@ const EditSection: React.FC<SectionProps> = ({ question, answer, editMode,focuse
 
         return (
             <div className="w-1/3">
-                <input type="text" onChange={handleTitleChange} defaultValue={title} className="block text-sm font-medium leading-6 text-gray-900 border-none w-full focus:" />
+                <input type="text" onChange={handleTitleChange} defaultValue={question.text} className="block text-sm font-medium leading-6 text-gray-900 border-none w-full focus:" />
 
                 <select
                     id={question.id.toString()}
@@ -117,7 +137,7 @@ const EditSection: React.FC<SectionProps> = ({ question, answer, editMode,focuse
     } else if (question.type == "MULTIPLE_CHOICE") {
         return (
             <fieldset>
-                <input type="text" onChange={handleTitleChange} defaultValue={title} className="block text-sm font-medium leading-6 text-gray-900 border-none w-full focus:" />
+                <input type="text" onChange={handleTitleChange} defaultValue={question.text} className="block text-sm font-medium leading-6 text-gray-900 border-none w-full focus:" />
 
                 <legend className="sr-only">{question.text}</legend>
                 <div className="space-y-5">

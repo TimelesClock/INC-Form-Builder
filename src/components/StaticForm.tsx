@@ -5,8 +5,6 @@ import { CSS } from '@dnd-kit/utilities';
 import Section from './Section';
 import type { JsonArray, JsonObject } from '@prisma/client/runtime/library';
 
-import { createId } from '@paralleldrive/cuid2'
-
 import { api } from '~/utils/api';
 
 import { useRouter } from 'next/router';

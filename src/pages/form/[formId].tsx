@@ -4,7 +4,7 @@ import DraggableQuestions from '../../components/DraggableQuestions';
 import { useForm } from "react-hook-form"
 import * as z from "zod"
 import { useRouter } from 'next/router';
-import { use, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import StaticForm from '~/components/StaticForm';
 import { api } from '~/utils/api';
@@ -14,8 +14,8 @@ import type { Answer } from '~/components/StaticForm';
 
 const FormPage = () => {
     const router = useRouter();
-    const { data: form } = api.form.getForm.useQuery({ id: router.query.formId as string });
-    const { data: answer } = api.answer.getAnswers.useQuery({ id: router.query.formId as string });
+    const { data: form } = api.form.getForm.useQuery({ id: router.query.formId as string }, { enabled: !!router.query.formId });
+    const { data: answer } = api.answer.getAnswers.useQuery({ id: router.query.formId as string }, { enabled: !!router.query.formId });
 
     const [questions, setQuestions] = useState<Question[]>([]);
     const [answers, setAnswers] = useState<Answer[]>([]);
