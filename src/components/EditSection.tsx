@@ -10,19 +10,22 @@ interface SectionProps {
     question: Question;
     answer?: string | string[];
     editMode?: boolean;
+    focused?: boolean;
 }
 
-const Section: React.FC<SectionProps> = ({ question, answer, editMode }) => {
+const EditSection: React.FC<SectionProps> = ({ question, answer, editMode,focused }) => {
     //prob not the best coding practice
     let content = null
-
+    const [title, setTitle] = useState<string>(question.text)
+    const handleTitleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setTitle(event.target.value)
+    }
 
     if (question.type === "SHORT_ANSWER") {
+
         return (
             <div>
-                <label htmlFor={question.id.toString()} className="block text-sm font-medium leading-6 text-gray-900">
-                    {question.text}
-                </label>
+                <input type="text" onChange={handleTitleChange} defaultValue={title} className="block text-sm font-medium leading-6 text-gray-900 border-none w-full focus:" />
                 <div className="mt-2">
                     <input
                         type="text"
@@ -39,9 +42,8 @@ const Section: React.FC<SectionProps> = ({ question, answer, editMode }) => {
     } else if (question.type === "PARAGRAPH") {
         return (
             <div>
-                <label htmlFor={question.id.toString()} className="block text-sm font-medium leading-6 text-gray-900">
-                    {question.text}
-                </label>
+                <input type="text" onChange={handleTitleChange} defaultValue={title} className="block text-sm font-medium leading-6 text-gray-900 border-none w-full focus:" />
+
                 <div className="mt-2">
                     <textarea
                         rows={4}
@@ -57,15 +59,15 @@ const Section: React.FC<SectionProps> = ({ question, answer, editMode }) => {
     } else if (question.type == "CHECKBOXES") {
         return (
             <fieldset>
-                <label className="block text-sm font-medium leading-6 text-gray-900 mt-5">{question.text}</label>
+                <input type="text" onChange={handleTitleChange} defaultValue={title} className="block text-sm font-medium leading-6 text-gray-900 border-none w-full focus:" />
                 <legend className="sr-only">{question.text}</legend>
                 <div className="space-y-5">
                     {question.options?.map((option, index) => {
                         let props
-                        if(editMode){
-                            props={disabled: editMode}
-                        }else{
-                            props={defaultChecked: answer === option.content}
+                        if (editMode) {
+                            props = { disabled: editMode }
+                        } else {
+                            props = { defaultChecked: answer === option.content }
                         }
                         return (
                             <div key={option.id} className="relative flex items-start">
@@ -96,9 +98,8 @@ const Section: React.FC<SectionProps> = ({ question, answer, editMode }) => {
 
         return (
             <div className="w-1/3">
-                <label htmlFor={question.id.toString()} className="block text-sm font-medium leading-6 text-gray-900 mt-5">
-                    {question.text}
-                </label>
+                <input type="text" onChange={handleTitleChange} defaultValue={title} className="block text-sm font-medium leading-6 text-gray-900 border-none w-full focus:" />
+
                 <select
                     id={question.id.toString()}
                     name={question.id.toString()}
@@ -116,7 +117,8 @@ const Section: React.FC<SectionProps> = ({ question, answer, editMode }) => {
     } else if (question.type == "MULTIPLE_CHOICE") {
         return (
             <fieldset>
-                <label className="block text-sm font-medium leading-6 text-gray-900 mt-5">{question.text}</label>
+                <input type="text" onChange={handleTitleChange} defaultValue={title} className="block text-sm font-medium leading-6 text-gray-900 border-none w-full focus:" />
+
                 <legend className="sr-only">{question.text}</legend>
                 <div className="space-y-5">
                     {question.options?.map((option, index) => {
@@ -156,4 +158,4 @@ const Section: React.FC<SectionProps> = ({ question, answer, editMode }) => {
 }
 
 
-export default Section
+export default EditSection
