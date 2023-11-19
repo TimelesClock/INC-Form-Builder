@@ -5,14 +5,7 @@ import { CSS } from '@dnd-kit/utilities';
 
 import { ControllerRenderProps } from 'react-hook-form';
 import Section from './Section';
-
-interface Question {
-    id: number;
-    text: string;
-    type: string;
-    options?: string[];
-    required?: boolean;
-}
+import type { Question } from './StaticForm';
 
 interface DraggableQuestionsProps {
     initialQuestions: Question[];
@@ -48,7 +41,7 @@ const SortableItem: React.FC<SortableItemProps> = ({ question }) => {
                     </div>
                 </div>
             </div>
-            <Section question={question} />
+            <Section question={question} editMode={true}/>
         </div>
     );
 };

@@ -34,11 +34,12 @@ export const userRouter = createTRPCRouter({
                     message: "Email already in use",
                 });
             }
+
             const user = await ctx.db.user.create({
                 data: {
                     name: name,
                     email: email,
-                    password: bcrypt.hashSync(password, 10),
+                    password: bcrypt.hashSync(password, 12),
                 },
             });
             return user;

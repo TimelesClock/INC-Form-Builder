@@ -7,52 +7,7 @@ import * as z from "zod"
 
 const FormPage = () => {
     // Replace with actual data fetching logic
-    const formQuestions = [
-        {
-            "id": 1,
-            "text": "What is your favorite color?",
-            "type": "SHORT_ANSWER"
-        },
-        {
-            "id": 2,
-            "text": "Describe your first memory.",
-            "type": "PARAGRAPH"
-        },
-        {
-            "id": 3,
-            "text": "Which of the following fruits do you like? (Select all that apply)",
-            "type": "CHECKBOXES",
-            "options": [
-                "Apples",
-                "Oranges",
-                "Bananas",
-                "Pears",
-                "Grapes"
-            ]
-        },
-        {
-            "id": 4,
-            "text": "What is your preferred mode of transportation?",
-            "type": "DROPDOWN",
-            "options": [
-                "Car",
-                "Bus",
-                "Train",
-                "Plane",
-                "Boat"
-            ]
-        },
-        {
-            "id": 5,
-            "text": "Do you enjoy coding?",
-            "type": "MULTIPLE_CHOICE",
-            "options": [
-                "Yes",
-                "No",
-                "Maybe"
-            ]
-        }
-    ]
+    const formQuestions = [{"id":"1","text":"What is your favorite color?","type":"SHORT_ANSWER"},{"id":"2","text":"Describe your first memory.","type":"PARAGRAPH"},{"id":"3","options":[{"content":"Apples","id":"SC4vm5iUUWRqSkbt"},{"content":"Oranges","id":"RzMnpwyYX4B8b7R5"},{"content":"Bananas","id":"bX2nWPPkpVusUMrq"},{"content":"Pears","id":"PQxLP0MrOXvjvcl2"},{"content":"Grapes","id":"m8PrzaueiP3jUnjl"}],"text":"Which of the following fruits do you like? (Select all that apply)","type":"CHECKBOXES"},{"id":"4","options":[{"content":"Car","id":"kJGRjGjPC7vNF8eX"},{"content":"Bus","id":"hRboui1raA9JIkbk"},{"content":"Train","id":"2IyYhJfiGr9ZHeoA"},{"content":"Plane","id":"uPnUiR2ZqlQdJewR"},{"content":"Boat","id":"NpYVjMuDCOM0k4k9"}],"text":"What is your preferred mode of transportation?","type":"DROPDOWN"},{"id":"5","options":[{"content":"Yes","id":"ATg3LX0wfpQY4FSQ"},{"content":"No","id":"EeEiIaL3FyyhZ9Id"},{"content":"Maybe","id":"Sia3t99HOMqSdjcQ"}],"text":"Do you enjoy coding?","type":"MULTIPLE_CHOICE"},{"id":"6","options":[{"content":"Car","id":"l9ipxPP5j8hD4OF6"},{"content":"Bus","id":"Usx7kYQFNB9TvXpP"},{"content":"Train","id":"j8yEcXY25WkJuXEQ"},{"content":"Plane","id":"YeUkt7j6m20Dtlcp"},{"content":"Boat","id":"EqEJjzInaWUP9AsA"}],"text":"What is your preferred mode of transportation?","type":"DROPDOWN"}]
 
 
     return (

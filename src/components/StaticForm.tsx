@@ -1,98 +1,115 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy, useSortable, } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import Section from './Section';
+import type { JsonArray, JsonObject } from '@prisma/client/runtime/library';
+
+import { createId } from '@paralleldrive/cuid2'
+
+import { api } from '~/utils/api';
+
+import { useRouter } from 'next/router';
 
 
 export interface Question {
-    id: number;
+    id: string;
     text: string;
     type: string;
-    options?: string[];
+    options?: Option[];
     required?: boolean;
 }
 
-interface StaticFormProps {
-    initialQuestions: Question[];
+export interface Option {
+    id: string;
+    content: string;
 }
 
-const StaticForm: React.FC = () => {
-    const question = [
-        {
-            "id": 1,
-            "text": "What is your favorite color?",
-            "type": "SHORT_ANSWER"
-        },
-        {
-            "id": 2,
-            "text": "Describe your first memory.",
-            "type": "PARAGRAPH"
-        },
-        {
-            "id": 3,
-            "text": "Which of the following fruits do you like? (Select all that apply)",
-            "type": "CHECKBOXES",
-            "options": [
-                "Apples",
-                "Oranges",
-                "Bananas",
-                "Pears",
-                "Grapes"
-            ]
-        },
-        {
-            "id": 4,
-            "text": "What is your preferred mode of transportation?",
-            "type": "DROPDOWN",
-            "options": [
-                "Car",
-                "Bus",
-                "Train",
-                "Plane",
-                "Boat"
-            ]
-        },
-        {
-            "id": 5,
-            "text": "Do you enjoy coding?",
-            "type": "MULTIPLE_CHOICE",
-            "options": [
-                "Yes",
-                "No",
-                "Maybe"
-            ]
-        },
-        {
-            "id": 6,
-            "text": "What is your preferred mode of transportation?",
-            "type": "DROPDOWN",
-            "options": [
-                "Car",
-                "Bus",
-                "Train",
-                "Plane",
-                "Boat"
-            ]
-        },
-    ]
+export interface Answer {
+    id: string;
+    content: string | string[];
+}
+
+interface StaticFormProps {
+    questions: Question[];
+    answers?: Answer[];
+}
+
+const StaticForm: React.FC<StaticFormProps> = ({ questions, answers }) => {
+
+    const router = useRouter()
+
+    const { mutate: addAnswer } = api.answer.addAnswer.useMutation();
 
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        //print out all data submitted data in json
         const data = new FormData(event.currentTarget);
-        const entries = [...data.entries()];
-        const jsonData = Object.fromEntries(entries);
-        console.log(jsonData);
-    }
+
+        // Initialize an object to hold the parsed form data
+        let jsonData: JsonObject = {};
+
+        // Process each form element
+        for (let element of event.currentTarget.elements) {
+            const input = element as HTMLInputElement;
+
+            if (input.nodeName !== "INPUT" && input.nodeName !== "TEXTAREA" && input.nodeName !== "SELECT" ) {
+                continue;
+            }
+            // Check if the element is a checkbox
+            if (input.type === "checkbox") {
+                if (!jsonData[input.name]) {
+                    jsonData[input.name] = [] as JsonArray;
+                }
+                if (input.checked) {
+                    let valueArr = jsonData[input.name] as JsonArray;
+                    valueArr.push(input.value);
+                    jsonData[input.name] = valueArr;
+                }
+            }
+            // Check if the element is a radio button
+            else if (input.type === "radio") {
+                if (input.checked) {
+                    jsonData[input.name] = input.value;
+                }
+            }
+            // Handle other input types
+            else {
+                jsonData[input.name] = input.value;
+            }
+        }
+
+        // Format the jsonData into {id:string, content:string | string[]}[]
+        let answers = [];
+        for (let key in jsonData) {
+            answers.push({ id: key, content: jsonData[key] as string[] | string});
+        }
+
+        // Add the answers to the database
+        let formId = router.query.formId as string;
+
+        addAnswer({ id: formId, answer: answers }, {
+            onSuccess: () => {
+                console.log("success");
+            }
+        });
+    };
+
 
     return (
         <>
             <form onSubmit={handleSubmit}>
                 <div className="border border-black p-4 my-2 grid">
-                    {question.map((question, index) => (
-                        <Section key={index} question={question as Question} />
-                    ))}
+                    {questions.map((question, index) => {
+                        let answer = answers?.find((answer) => answer.id === question.id);
+                        let content 
+                        if (answer && answer.content) {
+                            content = answer.content
+                        }
+
+                        return (
+                            <Section key={index} question={question as Question} answer={content} />
+                        )
+                    })}
 
                 </div>
                 <button

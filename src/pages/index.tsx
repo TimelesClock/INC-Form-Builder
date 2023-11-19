@@ -1,4 +1,4 @@
-
+import { useState, useEffect, use } from 'react';
 import Navbar from '../components/Navbar';
 import FormCreationSection from '../components/FormCreationSection';
 import FormsDisplay from '../components/FormsDisplay';
@@ -19,9 +19,21 @@ const fakeForms: Form[] = [
 ];
 
 const Home = () => {
-  const { data: session } = useSession();
-  const router = useRouter();
+  const [forms, setForms] = useState<Form[]>(fakeForms); // TODO: replace with [] once API is ready
+  const { data: session, status } = useSession();
 
+  const { data: form } = api.form.getForms.useQuery({});
+
+  useEffect(() => {
+    if (form) {
+      setForms(form);
+    }
+  })
+
+  if (status === 'loading') {
+    return <div>Loading...</div>;
+  }
+  const router = useRouter();
   if (!session) {
     return (
       <div>
@@ -40,7 +52,7 @@ const Home = () => {
     <div>
       <Navbar />
       <FormCreationSection />
-      <FormsDisplay forms={fakeForms} />
+      <FormsDisplay forms={forms} />
     </div>
   );
 };

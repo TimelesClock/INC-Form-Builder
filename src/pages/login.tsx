@@ -1,11 +1,11 @@
 import { useState } from 'react'
 import { signIn } from 'next-auth/react'
 import { api } from '~/utils/api'
-
+import { useRouter } from 'next/router'
 
 
 const Login = () => {
-
+    const router = useRouter();
     const [login, setLogin] = useState(true)
 
     const { mutate: register } = api.user.register.useMutation()
@@ -15,16 +15,16 @@ const Login = () => {
         const target = e.target as typeof e.target & {
             name: { value: string };
             email: { value: string };
-            password: { value: string };
+            pwdRegister: { value: string };
         };
 
-        const body = {
-            name: target.name.value,
-            email: target.email.value,
-            password: target.password.value
-        };
         try {
-            register(body)
+
+            register({
+                name: target.name.value,
+                email:target.email.value,
+                password: target.pwdRegister.value
+            })
 
         } catch (err) {
             console.log(err)
@@ -43,8 +43,12 @@ const Login = () => {
             password: target.password.value
         };
         try {
-            await signIn('credentials', { redirect: false, ...body })
-            window.location.href = '/'
+            let result = await signIn('credentials', { redirect: false, ...body })
+            if (result?.error) {
+                console.log(result.error)
+            }else{
+                router.push('/')
+            }
         } catch (err) {
             console.log(err)
         }
@@ -163,14 +167,14 @@ const Login = () => {
                                 </div>
                             </div>
                             <div>
-                                <label htmlFor="email" className="block text-sm font-medium leading-6 text-gray-900">
+                                <label htmlFor="emailRegister" className="block text-sm font-medium leading-6 text-gray-900">
                                     Email address
                                 </label>
                                 <div className="mt-2">
                                     <input
-                                        id="email"
-                                        name="email"
-                                        type="email"
+                                        id="emailRegister"
+                                        name="emailRegister"
+                                        type="emailRegister"
                                         autoComplete="email"
                                         required
                                         className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
@@ -180,15 +184,15 @@ const Login = () => {
 
                             <div>
                                 <div className="flex items-center justify-between">
-                                    <label htmlFor="password" className="block text-sm font-medium leading-6 text-gray-900">
+                                    <label htmlFor="pwdRegister" className="block text-sm font-medium leading-6 text-gray-900">
                                         Password
                                     </label>
                                 </div>
                                 <div className="mt-2">
                                     <input
-                                        id="password"
-                                        name="password"
-                                        type="password"
+                                        id="pwdRegister"
+                                        name="pwdRegister"
+                                        type="pwdRegister"
                                         autoComplete="new-password"
                                         required
                                         className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
@@ -198,15 +202,15 @@ const Login = () => {
 
                             <div>
                                 <div className="flex items-center justify-between">
-                                    <label htmlFor="password" className="block text-sm font-medium leading-6 text-gray-900">
+                                    <label htmlFor="cfmPwd" className="block text-sm font-medium leading-6 text-gray-900">
                                         Confirm Password
                                     </label>
                                 </div>
                                 <div className="mt-2">
                                     <input
-                                        id="password"
-                                        name="password"
-                                        type="password"
+                                        id="cfmPwd"
+                                        name="cfmPwd"
+                                        type="cfmPwd"
                                         autoComplete="new-password"
                                         required
                                         className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"

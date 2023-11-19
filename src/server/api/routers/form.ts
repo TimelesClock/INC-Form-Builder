@@ -23,8 +23,29 @@ export const formRouter = createTRPCRouter({
                         { invitations: { some: { userId: ctx.session.user.id } } },
                     ],
                 },
+                orderBy: {
+                    createdAt: "desc",
+                },
             });
             return forms;
+        }),
+
+    getForm: protectedProcedure
+        .input(z.object({ id: z.string() }))
+        .query(async ({ ctx, input }) => {
+            const { id } = input;
+            const form = await ctx.db.form.findUnique({
+                where: {
+                    id: id,
+                },
+            });
+            if (form == null) {
+                throw new TRPCError({
+                    code: "NOT_FOUND",
+                    message: "Form not found",
+                });
+            }
+            return form;
         }),
     //Create a Form in the db based on the prisma schema, set ownerid to the current user
     createForm: protectedProcedure
@@ -34,12 +55,13 @@ export const formRouter = createTRPCRouter({
         }))
         .mutation(async ({ ctx, input }) => {
             const { name, description } = input;
+            console.log(ctx.session)
             const form = await ctx.db.form.create({
                 data: {
                     title: name,
                     description: description,
                     ownerId: ctx.session.user.id,
-                    question: {},
+                    question: [],
                 },
             });
             return form;
@@ -47,12 +69,10 @@ export const formRouter = createTRPCRouter({
 
     createFormWithTemplate: protectedProcedure
         .input(z.object({
-            name: z.string(),
-            description: z.string(),
             templateId: z.string(),
         }))
         .mutation(async ({ ctx, input }) => {
-            const { name, description, templateId } = input;
+            const { templateId } = input;
             //Get the template
             const template = await ctx.db.formTemplate.findUnique({
                 where: {
@@ -68,8 +88,8 @@ export const formRouter = createTRPCRouter({
             //Create the form with the questions from the template
             const form = await ctx.db.form.create({
                 data: {
-                    title: name,
-                    description: description,
+                    title: "Copy of " + template.name,
+                    description: "Copy of " + template.name,
                     ownerId: ctx.session.user.id,
                     question: template.question as JsonObject,
                 },
@@ -95,6 +115,38 @@ export const formRouter = createTRPCRouter({
             return ctx.db.form.delete({
                 where: {
                     id: id,
+                },
+            });
+        }),
+    updateQuestions: protectedProcedure
+        .input(z.object({
+            id: z.string(),
+            questions: z.array(z.object({
+                id: z.string(),
+                question: z.string(),
+                type: z.string(),
+                options: z.array(z.string()),
+            })),
+        }))
+        .mutation(async ({ ctx, input }) => {
+            const { id, questions } = input;
+            const form = await ctx.db.form.findUnique({
+                where: {
+                    id: id,
+                },
+            });
+            if (form == null) {
+                throw new TRPCError({
+                    code: "NOT_FOUND",
+                    message: "Form not found",
+                });
+            }
+            return ctx.db.form.update({
+                where: {
+                    id: id,
+                },
+                data: {
+                    question: questions,
                 },
             });
         }),

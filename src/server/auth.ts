@@ -44,17 +44,25 @@ declare module "next-auth" {
  */
 export const authOptions: NextAuthOptions = {
   callbacks: {
-    session: ({ session, user }) => ({
-      ...session,
-      user: {
-        ...session.user,
-        id: user.id,
-      },
-    }),
-    signIn: async ({ user, account, profile, email, credentials }) => {
-      // Custom logic for sign-in event
-      return true; // Return true to allow the sign-in
+    session: ({ session, token }) => {
+      if (token) {
+        session.user.id = token.id as string;
+      }
+      return session
     },
+    jwt: async ({ token, user, account, profile, isNewUser }) => {
+      if (user) {
+        token.id = user.id;
+      }
+      return token
+    }
+  },
+  session: {
+    strategy: "jwt",
+
+  },
+  pages:{
+    signIn: '/login'
   },
   adapter: PrismaAdapter(db),
   providers: [
@@ -86,6 +94,7 @@ export const authOptions: NextAuthOptions = {
         const user = await prisma.user.findUnique({
           where: { email: credentials.email },
         });
+
 
         if (user && bcrypt.compareSync(credentials.password, user.password as string)) {
           return { id: user.id, name: user.name, email: user.email };
