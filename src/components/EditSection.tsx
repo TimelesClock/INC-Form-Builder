@@ -5,6 +5,7 @@ import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid'
 import type { Question, Option } from './StaticForm';
 
 import useStore from '~/store/useFormStore';
+import { createId } from '@paralleldrive/cuid2'
 
 
 
@@ -26,26 +27,62 @@ const EditSection: React.FC<SectionProps> = ({ question, answer, editMode, focus
         if (questionIndex >= 0) { // Ensure the index is found
             // Make a copy of the questions array
             let newQuestions = [...questions];
-        
+
             // Check if the question object exists at the found index
             const questionToUpdate = newQuestions[questionIndex];
             if (questionToUpdate) {
                 // Update the question's text
                 questionToUpdate.text = event.target.value;
-        
+
                 // Update the questions array
                 setQuestions(newQuestions);
             }
         }
-        
+    }
 
+    const addOption = () => {
+        const questionIndex = questions.findIndex((q) => q.id === question.id);
+        console.log("yes")
+        if (questionIndex >= 0) { // Ensure the index is found
+            // Make a copy of the questions array
+            let newQuestions = [...questions];
+
+            // Check if the question object exists at the found index
+            const questionToUpdate = newQuestions[questionIndex];
+            if (questionToUpdate) {
+                // Update the question's text
+                questionToUpdate.options?.push({ content: "New Option", id: createId() });
+
+                // Update the questions array
+                setQuestions(newQuestions);
+            }
+        }
+    }
+
+    const handleRemoveOption = (index: number) => {
+        const questionIndex = questions.findIndex((q) => q.id === question.id);
+
+        if (questionIndex >= 0) { // Ensure the index is found
+            // Make a copy of the questions array
+            let newQuestions = [...questions];
+
+            // Check if the question object exists at the found index
+            const questionToUpdate = newQuestions[questionIndex];
+            if (questionToUpdate) {
+                // Update the question's text
+                questionToUpdate.options?.splice(index, 1);
+
+                // Update the questions array
+                setQuestions(newQuestions);
+            }
+        }
     }
 
     if (question.type === "SHORT_ANSWER") {
 
         return (
             <div>
-                <input type="text" onChange={handleTitleChange} defaultValue={question.text} className="block text-sm font-medium leading-6 text-gray-900 border-none w-full focus:" />
+                <input type="text" onChange={handleTitleChange} defaultValue={question.text} className="block text-sm font-medium leading-6 text-gray-900 border-none w-full my-2" />
                 <div className="mt-2">
                     <input
                         type="text"
@@ -62,7 +99,7 @@ const EditSection: React.FC<SectionProps> = ({ question, answer, editMode, focus
     } else if (question.type === "PARAGRAPH") {
         return (
             <div>
-                <input type="text" onChange={handleTitleChange} defaultValue={question.text} className="block text-sm font-medium leading-6 text-gray-900 border-none w-full focus:" />
+                <input type="text" onChange={handleTitleChange} defaultValue={question.text} className="block text-sm font-medium leading-6 text-gray-900 border-none w-full my-2" />
 
                 <div className="mt-2">
                     <textarea
@@ -79,7 +116,7 @@ const EditSection: React.FC<SectionProps> = ({ question, answer, editMode, focus
     } else if (question.type == "CHECKBOXES") {
         return (
             <fieldset>
-                <input type="text" onChange={handleTitleChange} defaultValue={question.text} className="block text-sm font-medium leading-6 text-gray-900 border-none w-full focus:" />
+                <input type="text" onChange={handleTitleChange} defaultValue={question.text} className="block text-sm font-medium leading-6 text-gray-900 border-none w-full my-2" />
                 <legend className="sr-only">{question.text}</legend>
                 <div className="space-y-5">
                     {question.options?.map((option, index) => {
@@ -90,8 +127,8 @@ const EditSection: React.FC<SectionProps> = ({ question, answer, editMode, focus
                             props = { defaultChecked: answer === option.content }
                         }
                         return (
-                            <div key={option.id} className="relative flex items-start">
-                                <div className="flex h-6 items-center">
+                            <div key={option.id} className="relative flex items-center justify-between">
+                                <div className="flex items-center">
                                     <input
                                         id={option.id}
                                         aria-describedby={option.id}
@@ -101,15 +138,36 @@ const EditSection: React.FC<SectionProps> = ({ question, answer, editMode, focus
                                         value={option.content}
                                         {...props}
                                     />
+                                    <div className="ml-3 text-sm leading-6">
+                                        <label htmlFor={option.id} className="font-medium text-gray-900">
+                                            <input className="block text-sm font-medium leading-6 text-gray-900 border-none w-full" type="text" defaultValue={option.content} />
+                                        </label>
+                                    </div>
                                 </div>
-                                <div className="ml-3 text-sm leading-6">
-                                    <label htmlFor={option.id} className="font-medium text-gray-900">
-                                        {option.content}
-                                    </label>
-                                </div>
+                                {focused &&
+                                    <svg onClick={() => handleRemoveOption(index)} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6 cursor-pointer hover:bg-slate-100  rounded-3xl ">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>}
                             </div>
                         )
                     })}
+
+                    {focused && (question?.options?.length !== 1) && (
+                        <div className="relative flex items-start" style={{ opacity: '0.5' }} >
+                            <div className="flex h-6 items-center">
+                                <input
+                                    type="checkbox"
+                                    className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
+                                    disabled={true}
+                                />
+                            </div>
+                            <div className="ml-6 text-sm leading-6" onClick={addOption}>
+                                <label className="font-medium text-gray-900">
+                                    Add option
+                                </label>
+                            </div>
+                        </div>
+                    )}
 
                 </div>
             </fieldset>
@@ -118,26 +176,56 @@ const EditSection: React.FC<SectionProps> = ({ question, answer, editMode, focus
 
         return (
             <div className="w-1/3">
-                <input type="text" onChange={handleTitleChange} defaultValue={question.text} className="block text-sm font-medium leading-6 text-gray-900 border-none w-full focus:" />
+                <input type="text" onChange={handleTitleChange} defaultValue={question.text} className="block text-sm font-medium leading-6 text-gray-900 border-none w-full my-2" />
 
-                <select
-                    id={question.id.toString()}
-                    name={question.id.toString()}
-                    className="block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-600 focus:border-indigo-600 sm:text-sm rounded-md"
-                    defaultValue={answer || ""}
-                    disabled={editMode}
-                >
-                    <option disabled>Select an option</option>
-                    {question.options?.map((option, index) => (
-                        <option key={option.id} disabled={editMode}>{option.content}</option>
-                    ))}
-                </select>
+                <div className="space-y-5">
+                    {question.options?.map((option, index) => {
+                        let props
+                        if (editMode) {
+                            props = { disabled: editMode }
+                        } else {
+                            props = { defaultChecked: answer === option.content }
+                        }
+                        return (
+                            <div key={option.id} className="relative flex items-center justify-between">
+                                <div className="flex items-center">
+                                    <div id={option.id}>
+                                        {index + 1}.
+                                    </div>
+                                    <div className="ml-3 text-sm leading-6">
+                                        <label htmlFor={option.id} className="font-medium text-gray-900">
+                                            <input className="block text-sm font-medium leading-6 text-gray-900 border-none w-full" type="text" defaultValue={option.content} />
+                                        </label>
+                                    </div>
+                                </div>
+                                {focused &&
+                                    <svg onClick={() => handleRemoveOption(index)} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className="w-6 h-6 cursor-pointer hover:bg-slate-100  rounded-3xl ">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>}
+                            </div>
+                        )
+                    })}
+
+                    {focused && (question?.options?.length !== 1) && (
+                        <div className="relative flex items-start" style={{ opacity: '0.5' }} >
+                            <div className="flex h-6 items-center">
+
+                            </div>
+                            <div className="ml-8 text-sm leading-6" onClick={addOption}>
+                                <label className="font-medium text-gray-900">
+                                    Add option
+                                </label>
+                            </div>
+                        </div>
+                    )}
+
+                </div>
             </div>
         )
     } else if (question.type == "MULTIPLE_CHOICE") {
         return (
             <fieldset>
-                <input type="text" onChange={handleTitleChange} defaultValue={question.text} className="block text-sm font-medium leading-6 text-gray-900 border-none w-full focus:" />
+                <input type="text" onChange={handleTitleChange} defaultValue={question.text} className="block text-sm font-medium leading-6 text-gray-900 border-none w-full my-2" />
 
                 <legend className="sr-only">{question.text}</legend>
                 <div className="space-y-5">
@@ -150,7 +238,7 @@ const EditSection: React.FC<SectionProps> = ({ question, answer, editMode, focus
                             props = { defaultChecked: answer === option.content }
                         }
                         return (
-                            <div key={option.id} className="relative flex items-start">
+                            <div key={option.id} className="relative flex items-start justify-between">
                                 <div className="flex h-6 items-center">
                                     <input
                                         id={option.id}
@@ -161,15 +249,36 @@ const EditSection: React.FC<SectionProps> = ({ question, answer, editMode, focus
                                         className="h-4 w-4 border-gray-300 text-indigo-600 focus:ring-indigo-600"
                                         {...props}
                                     />
+                                    <div className="ml-6 text-sm leading-6">
+                                        <label htmlFor={option.id} className="font-medium text-gray-900">
+                                            <input className="block text-sm font-medium leading-6 text-gray-900 border-none w-full" type="text" defaultValue={option.content} />
+                                        </label>
+                                    </div>
                                 </div>
-                                <div className="ml-3 text-sm leading-6">
-                                    <label htmlFor={option.id} className="font-medium text-gray-900">
-                                        {option.content}
-                                    </label>
-                                </div>
+
+                                {focused &&
+                                    <svg onClick={() => handleRemoveOption(index)} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className=" w-6 h-6 cursor-pointer hover:bg-slate-100  rounded-3xl ">
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>}
                             </div>
                         )
                     })}
+                    {focused && (question?.options?.length !== 1) && (
+                        <div className="relative flex items-start" style={{ opacity: '0.5' }} >
+                            <div className="flex h-6 items-center">
+                                <input
+                                    type="checkbox"
+                                    className="h-4 w-4 rounded border-gray-300 text-indigo-600 focus:ring-indigo-600"
+                                    disabled={true}
+                                />
+                            </div>
+                            <div className="ml-9 text-sm leading-6" onClick={addOption}>
+                                <label className="font-medium text-gray-900">
+                                    Add option
+                                </label>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </fieldset>
         )

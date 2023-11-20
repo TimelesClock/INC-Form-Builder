@@ -7,6 +7,7 @@ import { Switch } from '@headlessui/react'
 
 import EditSection from './EditSection';
 import type { Question } from './StaticForm';
+import useStore from '~/store/useFormStore';
 
 interface DraggableQuestionsProps {
     initialQuestions: Question[];
@@ -23,6 +24,7 @@ function classNames(...classes: (string | boolean | undefined)[]) {
 
 const SortableItem: React.FC<SortableItemProps> = ({ question }) => {
     const { attributes, listeners, setNodeRef, transform, transition, setActivatorNodeRef } = useSortable({ id: question.id.toString() });
+    const [questions, setQuestions] = useStore((state) => [state.questions, state.setQuestions])
     const [focused, setFocused] = useState<boolean>(false);
     const [enabled, setEnabled] = useState<boolean>(false);
 
@@ -44,13 +46,19 @@ const SortableItem: React.FC<SortableItemProps> = ({ question }) => {
         } else {
             setFocused(false);
         }
+    }
 
+    const handleDeleteSection = () => {
+        
+        let newQuestion:Question[] = questions.filter((q) => q.id !== question.id)
+        console.log(newQuestion)
+        setQuestions(newQuestion)
     }
 
     return (
         <div tabIndex={0} ref={parentRef} className={`border my-2 p-4 ${focused ? 'border-rose-500' : 'border-black'}`} onFocus={handleSetFocus} onBlur={handleBlur}>
             <div tabIndex={0} ref={setNodeRef} style={style} className={`relative border-1  grid `} >
-                <div ref={setActivatorNodeRef} {...listeners} className="cursor-move self-center w-5 justify-self-center my-3">
+                <div ref={setActivatorNodeRef} {...listeners} className="cursor-move self-center w-5 justify-self-center my-1">
                     {/* Drag handle, style as needed */}
                     <div className="">
                         <div className="w-5 flex justify-between">
@@ -65,9 +73,9 @@ const SortableItem: React.FC<SortableItemProps> = ({ question }) => {
                         </div>
                     </div>
                 </div>
-                <EditSection question={question} editMode={true} focused={true} />
+                <EditSection question={question} editMode={true} focused={focused} />
                 <div className={`${focused ? "animate-fadeIn" : "hidden"} self-end justify-self-end mt-5 flex`}>
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 me-5 cursor-pointer">
+                    <svg onClick={handleDeleteSection} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 me-5 cursor-pointer">
                         <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
                     </svg>
                     <div
@@ -128,18 +136,17 @@ const SortableItem: React.FC<SortableItemProps> = ({ question }) => {
 };
 
 
-const DraggableQuestions: React.FC<DraggableQuestionsProps> = ({ initialQuestions }) => {
-    const [questions, setQuestions] = useState<Question[]>(initialQuestions);
+const DraggableQuestions: React.FC = () => {
+    const [questions, setQuestions] = useStore((state) => [state.questions, state.setQuestions])
     const sensors = useSensors(useSensor(PointerSensor), useSensor(KeyboardSensor));
 
     const handleDragEnd = (event: DragEndEvent) => {
         const { active, over } = event;
         if (over && active.id !== over.id) {
-            setQuestions((items) => {
-                const oldIndex = items.findIndex((item) => item.id.toString() === active.id);
-                const newIndex = items.findIndex((item) => item.id.toString() === over.id);
-                return arrayMove(items, oldIndex, newIndex);
-            });
+            let oldIndex = questions.findIndex((q) => q.id === active.id)
+            let newIndex = questions.findIndex((q) => q.id === over.id)
+            let newQuestions = arrayMove(questions, oldIndex, newIndex)
+            setQuestions(newQuestions)
         }
     };
 
