@@ -123,9 +123,14 @@ export const formRouter = createTRPCRouter({
             id: z.string(),
             questions: z.array(z.object({
                 id: z.string(),
-                question: z.string(),
+                text: z.string(),
                 type: z.string(),
-                options: z.array(z.string()),
+                options: z.array(z.object({
+                    id: z.string(),
+                    content: z.string(),
+                }
+                )).optional(),
+                required: z.boolean().optional(),
             })),
         }))
         .mutation(async ({ ctx, input }) => {

@@ -16,8 +16,6 @@ interface SectionProps {
 const Section: React.FC<SectionProps> = ({ question, answer, editMode }) => {
     //prob not the best coding practice
     let content = null
-    
-
 
     if (question.type === "SHORT_ANSWER") {
         return (

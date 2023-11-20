@@ -3,7 +3,7 @@ import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, us
 import { SortableContext, verticalListSortingStrategy, useSortable, } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { Switch } from '@headlessui/react'
-
+import { createId } from '@paralleldrive/cuid2';
 
 import EditSection from './EditSection';
 import type { Question } from './StaticForm';
@@ -49,14 +49,53 @@ const SortableItem: React.FC<SortableItemProps> = ({ question }) => {
     }
 
     const handleDeleteSection = () => {
-        
-        let newQuestion:Question[] = questions.filter((q) => q.id !== question.id)
-        console.log(newQuestion)
+
+        let newQuestion: Question[] = questions.filter((q) => q.id !== question.id)
         setQuestions(newQuestion)
     }
 
+    const handleAddQuestion = () => {
+        let newQuestion: Question[] = [...questions]
+        let index = newQuestion.findIndex((q) => q.id === question.id)
+        let newQ: Question = {
+            id: createId(),
+            text: "New Question",
+            type: "SHORT_ANSWER",
+            options: []
+        }
+        newQuestion.splice(index + 1, 0, newQ)
+        setQuestions(newQuestion)
+    }
+
+    const handleSetRequired = () => {
+        setEnabled(!enabled);
+        const questionIndex = questions.findIndex((q) => q.id === question.id);
+
+        if (questionIndex >= 0) { // Ensure the index is found
+            // Make a copy of the questions array
+            let newQuestions = [...questions];
+
+            // Check if the question object exists at the found index
+            const questionToUpdate = newQuestions[questionIndex];
+            if (questionToUpdate) {
+                // Update the question's text
+                questionToUpdate.required = !enabled;
+
+                // Update the questions array
+                setQuestions(newQuestions);
+            }
+        }
+        console.log(questions)
+    }
+
+
     return (
         <div tabIndex={0} ref={parentRef} className={`border my-2 p-4 ${focused ? 'border-rose-500' : 'border-black'}`} onFocus={handleSetFocus} onBlur={handleBlur}>
+            {focused && <div onClick={handleAddQuestion} className="absolute right-12 border border-black p-3 rounded-xl hover:bg-slate-100 cursor-pointer">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth="1.5" stroke="currentColor" className=" cursor-pointer w-8 h-8 ">
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+            </div>}
             <div tabIndex={0} ref={setNodeRef} style={style} className={`relative border-1  grid `} >
                 <div ref={setActivatorNodeRef} {...listeners} className="cursor-move self-center w-5 justify-self-center my-1">
                     {/* Drag handle, style as needed */}
@@ -86,7 +125,7 @@ const SortableItem: React.FC<SortableItemProps> = ({ question }) => {
                     </div>
                     <Switch
                         checked={enabled}
-                        onChange={setEnabled}
+                        onClick={handleSetRequired}
                         className={classNames(
                             enabled ? 'bg-indigo-600' : 'bg-gray-200',
                             'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-indigo-600 focus:ring-offset-2'

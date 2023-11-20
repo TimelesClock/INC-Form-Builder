@@ -6,8 +6,7 @@ import type { Question, Option } from './StaticForm';
 
 import useStore from '~/store/useFormStore';
 import { createId } from '@paralleldrive/cuid2'
-
-
+import EditSectionDropdown from './EditSectionDropdown';
 
 interface SectionProps {
     question: Question;
@@ -20,6 +19,30 @@ const EditSection: React.FC<SectionProps> = ({ question, answer, editMode, focus
     //prob not the best coding practice
     let content = null
     const [questions, setQuestions] = useStore((state) => [state.questions, state.setQuestions])
+    
+    const handleQuestionTypeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+        const questionIndex = questions.findIndex((q) => q.id === question.id);
+
+        if (questionIndex >= 0) { // Ensure the index is found
+            // Make a copy of the questions array
+            let newQuestions = [...questions];
+
+            // Check if the question object exists at the found index
+            const questionToUpdate = newQuestions[questionIndex];
+            if (questionToUpdate) {
+                // Update the question's type
+                questionToUpdate.type = event.target.value;
+                //Remove the content of the question unless its changing from CHECKBOXES, MULTIPLE_CHOICE, or DROPDOWN and to one of those
+                let specialCase = ["CHECKBOXES", "MULTIPLE_CHOICE", "DROPDOWN"]
+                if (!specialCase.includes(event.target.value) && specialCase.includes(questionToUpdate.type)) {
+                    questionToUpdate.options = []
+                }
+
+                // Update the questions array
+                setQuestions(newQuestions);
+            }
+        }
+    }
 
     const handleTitleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         const questionIndex = questions.findIndex((q) => q.id === question.id);
@@ -42,7 +65,7 @@ const EditSection: React.FC<SectionProps> = ({ question, answer, editMode, focus
 
     const addOption = () => {
         const questionIndex = questions.findIndex((q) => q.id === question.id);
-        console.log("yes")
+
         if (questionIndex >= 0) { // Ensure the index is found
             // Make a copy of the questions array
             let newQuestions = [...questions];
@@ -78,11 +101,17 @@ const EditSection: React.FC<SectionProps> = ({ question, answer, editMode, focus
         }
     }
 
+
+
     if (question.type === "SHORT_ANSWER") {
 
         return (
             <div>
-                <input type="text" onChange={handleTitleChange} defaultValue={question.text} className="block text-sm font-medium leading-6 text-gray-900 border-none w-full my-2" />
+                <div className="flex flex-row justify-between my-2">
+                    <input type="text" onChange={handleTitleChange} defaultValue={question.text} className=" block w-1/2 text-sm font-medium leading-6 text-gray-900 border-none" />
+                    {focused&&<EditSectionDropdown type={question.type} handleChange={handleQuestionTypeChange} />}
+                </div>
+
                 <div className="mt-2">
                     <input
                         type="text"
@@ -99,8 +128,10 @@ const EditSection: React.FC<SectionProps> = ({ question, answer, editMode, focus
     } else if (question.type === "PARAGRAPH") {
         return (
             <div>
-                <input type="text" onChange={handleTitleChange} defaultValue={question.text} className="block text-sm font-medium leading-6 text-gray-900 border-none w-full my-2" />
-
+                <div className="flex flex-row justify-between my-2">
+                    <input type="text" onChange={handleTitleChange} defaultValue={question.text} className=" block w-1/2 text-sm font-medium leading-6 text-gray-900 border-none" />
+                    {focused&&<EditSectionDropdown type={question.type} handleChange={handleQuestionTypeChange} />}
+                </div>
                 <div className="mt-2">
                     <textarea
                         rows={4}
@@ -116,8 +147,10 @@ const EditSection: React.FC<SectionProps> = ({ question, answer, editMode, focus
     } else if (question.type == "CHECKBOXES") {
         return (
             <fieldset>
-                <input type="text" onChange={handleTitleChange} defaultValue={question.text} className="block text-sm font-medium leading-6 text-gray-900 border-none w-full my-2" />
-                <legend className="sr-only">{question.text}</legend>
+                <div className="flex flex-row justify-between my-2">
+                    <input type="text" onChange={handleTitleChange} defaultValue={question.text} className=" block w-1/2 text-sm font-medium leading-6 text-gray-900 border-none" />
+                    {focused&&<EditSectionDropdown type={question.type} handleChange={handleQuestionTypeChange} />}
+                </div>                <legend className="sr-only">{question.text}</legend>
                 <div className="space-y-5">
                     {question.options?.map((option, index) => {
                         let props
@@ -175,9 +208,11 @@ const EditSection: React.FC<SectionProps> = ({ question, answer, editMode, focus
     } else if (question.type == "DROPDOWN") {
 
         return (
-            <div className="w-1/3">
-                <input type="text" onChange={handleTitleChange} defaultValue={question.text} className="block text-sm font-medium leading-6 text-gray-900 border-none w-full my-2" />
-
+            <div className="">
+                <div className="flex flex-row justify-between my-2">
+                    <input type="text" onChange={handleTitleChange} defaultValue={question.text} className=" block w-1/2 text-sm font-medium leading-6 text-gray-900 border-none" />
+                    {focused&&<EditSectionDropdown type={question.type} handleChange={handleQuestionTypeChange} />}
+                </div>
                 <div className="space-y-5">
                     {question.options?.map((option, index) => {
                         let props
@@ -225,8 +260,10 @@ const EditSection: React.FC<SectionProps> = ({ question, answer, editMode, focus
     } else if (question.type == "MULTIPLE_CHOICE") {
         return (
             <fieldset>
-                <input type="text" onChange={handleTitleChange} defaultValue={question.text} className="block text-sm font-medium leading-6 text-gray-900 border-none w-full my-2" />
-
+                <div className="flex flex-row justify-between my-2">
+                    <input type="text" onChange={handleTitleChange} defaultValue={question.text} className=" block w-1/2 text-sm font-medium leading-6 text-gray-900 border-none" />
+                    {focused&&<EditSectionDropdown type={question.type} handleChange={handleQuestionTypeChange} />}
+                </div>
                 <legend className="sr-only">{question.text}</legend>
                 <div className="space-y-5">
                     {question.options?.map((option, index) => {
