@@ -13,22 +13,25 @@ interface Form {
   // Add more form details here
 }
 
-const fakeForms: Form[] = [
-  { title: "no", id: "1" },
-  { title: "yes", id: "2" }
-];
-
 const Home = () => {
-  const [forms, setForms] = useState<Form[]>(fakeForms); // TODO: replace with [] once API is ready
+  const [forms, setForms] = useState<Form[]>([]);
+  const [invitedForms, setInvitedForms] = useState<Form[]>([]);
   const { data: session, status } = useSession();
 
   const { data: form } = api.form.getForms.useQuery({});
+  const { data: invitedForm } = api.form.getInvitedForms.useQuery({});
 
   useEffect(() => {
     if (form) {
       setForms(form);
     }
-  })
+  }, [form])
+
+  useEffect(() => {
+    if (invitedForm) {
+      setInvitedForms(invitedForm);
+    }
+  }, [invitedForm])
 
   if (status === 'loading') {
     return <div>Loading...</div>;
@@ -52,7 +55,7 @@ const Home = () => {
     <div>
       <Navbar />
       <FormCreationSection />
-      <FormsDisplay forms={forms} />
+      <FormsDisplay forms={forms} invitedForms={invitedForms} />
     </div>
   );
 };

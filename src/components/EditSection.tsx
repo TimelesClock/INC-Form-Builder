@@ -265,7 +265,7 @@ const EditSection: React.FC<SectionProps> = ({ question, answer, editMode, focus
                     {focused&&<EditSectionDropdown type={question.type} handleChange={handleQuestionTypeChange} />}
                 </div>
                 <legend className="sr-only">{question.text}</legend>
-                <div className="space-y-5">
+                <div className="mt-5 space-y-5">
                     {question.options?.map((option, index) => {
                         //show defaultChecked attribute if editMode isnt true
                         let props

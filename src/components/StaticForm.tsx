@@ -8,6 +8,7 @@ import type { JsonArray, JsonObject } from '@prisma/client/runtime/library';
 import { api } from '~/utils/api';
 
 import { useRouter } from 'next/router';
+import toast from 'react-hot-toast';
 
 
 export interface Question {
@@ -34,14 +35,13 @@ interface StaticFormProps {
 }
 
 const StaticForm: React.FC<StaticFormProps> = ({ questions, answers }) => {
-
+    const util = api.useUtils();
     const router = useRouter()
 
     const { mutate: addAnswer } = api.answer.addAnswer.useMutation();
 
     const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
-        const data = new FormData(event.currentTarget);
 
         // Initialize an object to hold the parsed form data
         let jsonData: JsonObject = {};
@@ -52,6 +52,10 @@ const StaticForm: React.FC<StaticFormProps> = ({ questions, answers }) => {
 
             if (input.nodeName !== "INPUT" && input.nodeName !== "TEXTAREA" && input.nodeName !== "SELECT" ) {
                 continue;
+            }
+            //if the input id starts with checkbox continue
+            if (input.id.startsWith("checkbox")) {
+                continue
             }
             // Check if the element is a checkbox
             if (input.type === "checkbox") {
@@ -87,7 +91,9 @@ const StaticForm: React.FC<StaticFormProps> = ({ questions, answers }) => {
 
         addAnswer({ id: formId, answer: answers }, {
             onSuccess: () => {
-                console.log("success");
+                util.answer.getAnswers.refetch({ id: formId });
+                toast.success("Response saved!")
+                router.push("/")
             }
         });
     };

@@ -28,6 +28,7 @@ export const userRouter = createTRPCRouter({
                     email: email,
                 },
             });
+            
             if (userExists) {
                 throw new TRPCError({
                     code: "BAD_REQUEST",

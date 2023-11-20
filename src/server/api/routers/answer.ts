@@ -6,11 +6,71 @@ import {
     publicProcedure,
 } from "~/server/api/trpc";
 import { type JsonObject } from "@prisma/client/runtime/library";
+import { type User } from "@prisma/client";
 
 import { TRPCError } from "@trpc/server";
 
 
 export const answerRouter = createTRPCRouter({
+
+    //Get all users who have answered the form
+    getAnsweredUsers: protectedProcedure
+        .input(z.object({ id: z.string() }))
+        .query(async ({ ctx, input }) => {
+            const { id } = input;
+            const form = await ctx.db.form.findUnique({
+                where: {
+                    id: id,
+                },
+            });
+            if (form == null) {
+                throw new TRPCError({
+                    code: "NOT_FOUND",
+                    message: "Form not found",
+                });
+            }
+            //return an array of users
+            const users = await ctx.db.answer.findMany({
+                where: {
+                    formId: id,
+                },
+                select: {
+                    user: true,
+                },
+            });
+            let userArray: User[] = []
+            users.forEach((user) => {
+                userArray.push(user.user)
+            })
+            return userArray;
+        }),
+
+    getUserAnswers: protectedProcedure
+        .input(z.object({ id: z.string() }))
+        .query(async ({ ctx, input }) => {
+            const { id } = input;
+            const form = await ctx.db.form.findUnique({
+                where: {
+                    id: id,
+                },
+            });
+            if (form == null) {
+                throw new TRPCError({
+                    code: "NOT_FOUND",
+                    message: "Form not found",
+                });
+            }
+            const users = await ctx.db.answer.findMany({
+                where: {
+                    formId: id,
+                },
+                select: {
+                    user: true,
+                    content: true,
+                },
+            });
+            return users;
+        }),
 
     addAnswer: protectedProcedure
         .input(z.object({
@@ -111,6 +171,6 @@ export const answerRouter = createTRPCRouter({
                     formId: id,
                 },
             });
-            return answers?.content;
+            return answers?.content || [];
         }),
 });

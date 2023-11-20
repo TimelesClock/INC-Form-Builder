@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { signIn } from 'next-auth/react'
 import { api } from '~/utils/api'
 import { useRouter } from 'next/router'
+import toast from 'react-hot-toast'
 
 
 const Login = () => {
@@ -14,7 +15,7 @@ const Login = () => {
         e.preventDefault()
         const target = e.target as typeof e.target & {
             name: { value: string };
-            email: { value: string };
+            emailRegister: { value: string };
             pwdRegister: { value: string };
         };
 
@@ -22,12 +23,23 @@ const Login = () => {
 
             register({
                 name: target.name.value,
-                email:target.email.value,
+                email:target.emailRegister.value,
                 password: target.pwdRegister.value
             })
 
+            let result = await signIn('credentials', { redirect: false, email: target.emailRegister.value, password: target.pwdRegister.value })
+            if (result?.error) {
+                console.log(result.error)
+            }else{
+                toast.success("Account created successfully")
+                router.push('/')
+                
+            }
+            
+
         } catch (err) {
             console.log(err)
+            toast.error("Something wrong has occurred")
         }
     }
 
@@ -47,6 +59,7 @@ const Login = () => {
             if (result?.error) {
                 console.log(result.error)
             }else{
+                toast.success("Logged in successfully")
                 router.push('/')
             }
         } catch (err) {

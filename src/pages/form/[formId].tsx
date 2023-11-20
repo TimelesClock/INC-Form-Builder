@@ -15,6 +15,7 @@ import type { Answer } from '~/components/StaticForm';
 const FormPage = () => {
     const router = useRouter();
     const { data: form } = api.form.getForm.useQuery({ id: router.query.formId as string }, { enabled: !!router.query.formId });
+    
     const { data: answer } = api.answer.getAnswers.useQuery({ id: router.query.formId as string }, { enabled: !!router.query.formId });
 
     const [questions, setQuestions] = useState<Question[]>([]);
@@ -25,6 +26,7 @@ const FormPage = () => {
             setQuestions(form.question as unknown as Question[]);
         }
     }, [form])
+    
 
     useEffect(() => {
         if (answer) {
