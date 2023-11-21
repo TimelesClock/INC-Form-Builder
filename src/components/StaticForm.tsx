@@ -1,7 +1,5 @@
-import React, { useEffect, useState } from 'react';
-import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
-import { SortableContext, verticalListSortingStrategy, useSortable, } from '@dnd-kit/sortable';
-import { CSS } from '@dnd-kit/utilities';
+import React from 'react';
+
 import Section from './Section';
 import type { JsonArray, JsonObject } from '@prisma/client/runtime/library';
 
@@ -44,10 +42,10 @@ const StaticForm: React.FC<StaticFormProps> = ({ questions, answers }) => {
         event.preventDefault();
 
         // Initialize an object to hold the parsed form data
-        let jsonData: JsonObject = {};
+        const jsonData: JsonObject = {};
 
         // Process each form element
-        for (let element of event.currentTarget.elements) {
+        for (const element of event.currentTarget.elements) {
             const input = element as HTMLInputElement;
 
             if (input.nodeName !== "INPUT" && input.nodeName !== "TEXTAREA" && input.nodeName !== "SELECT" ) {
@@ -63,7 +61,7 @@ const StaticForm: React.FC<StaticFormProps> = ({ questions, answers }) => {
                     jsonData[input.name] = [] as JsonArray;
                 }
                 if (input.checked) {
-                    let valueArr = jsonData[input.name] as JsonArray;
+                    const valueArr = jsonData[input.name] as JsonArray;
                     valueArr.push(input.value);
                     jsonData[input.name] = valueArr;
                 }
@@ -81,19 +79,19 @@ const StaticForm: React.FC<StaticFormProps> = ({ questions, answers }) => {
         }
 
         // Format the jsonData into {id:string, content:string | string[]}[]
-        let answers = [];
-        for (let key in jsonData) {
+        const answers = [];
+        for (const key in jsonData) {
             answers.push({ id: key, content: jsonData[key] as string[] | string});
         }
 
         // Add the answers to the database
-        let formId = router.query.formId as string;
+        const formId = router.query.formId as string;
 
         addAnswer({ id: formId, answer: answers }, {
             onSuccess: () => {
-                util.answer.getAnswers.refetch({ id: formId });
+                void util.answer.getAnswers.refetch({ id: formId });
                 toast.success("Response saved!")
-                router.push("/")
+                void router.push("/")
             }
         });
     };
@@ -104,14 +102,14 @@ const StaticForm: React.FC<StaticFormProps> = ({ questions, answers }) => {
             <form onSubmit={handleSubmit}>
                 <div className="border border-black p-4 my-2 grid">
                     {questions.map((question, index) => {
-                        let answer = answers?.find((answer) => answer.id === question.id);
+                        const answer = answers?.find((answer) => answer.id === question.id);
                         let content 
-                        if (answer && answer.content) {
+                        if (answer?.content) {
                             content = answer.content
                         }
 
                         return (
-                            <Section key={index} question={question as Question} answer={content} />
+                            <Section key={index} question={question} answer={content} />
                         )
                     })}
 

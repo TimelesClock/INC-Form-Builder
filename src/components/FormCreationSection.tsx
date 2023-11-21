@@ -21,8 +21,8 @@ const FormCreationSection = () => {
   const handleCreateForm = () => {
     createForm({ name: "New Form", description: "New Form Description" },
       {
-        onSuccess: async() => {
-          await utils.form.getForms.refetch()
+        onSuccess: () => {
+          void utils.form.getForms.refetch()
         }
       });
 

@@ -24,7 +24,9 @@ const FormsDisplay = ({ forms,invitedForms }: FormsDisplayProps) => {
             <h2 className="mt-2 text-xl font-bold tracking-tight text-gray-900">Your forms</h2>
             <div className="grid grid-cols-3 gap-4 p-4">
                 {forms.map((form, index) => (
-                    <div className="border border-gray-300 rounded-xl flex justify-between hover:bg-slate-100 cursor-pointer" key={index} onClick={() => {}}>
+                    <div className="border border-gray-300 rounded-xl flex justify-between hover:bg-slate-100 cursor-pointer" key={index} onClick={() => {
+                        //placeholder
+                    }}>
                         <div key={index} className="p-4">
                             <h3 className="text-lg font-semibold">{form.title}</h3>
                         </div>

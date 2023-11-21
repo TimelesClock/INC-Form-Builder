@@ -8,7 +8,6 @@ import {
 } from "next-auth";
 // import DiscordProvider from "next-auth/providers/discord";
 
-import { env } from "~/env.mjs";
 import { db } from "~/server/db";
 
 import bcrypt from 'bcryptjs';
@@ -50,7 +49,7 @@ export const authOptions: NextAuthOptions = {
       }
       return session
     },
-    jwt: async ({ token, user, account, profile, isNewUser }) => {
+    jwt:  ({ token, user}) => {
       if (user) {
         token.id = user.id;
       }
@@ -96,7 +95,7 @@ export const authOptions: NextAuthOptions = {
         });
 
 
-        if (user && bcrypt.compareSync(credentials.password, user.password as string)) {
+        if (user && bcrypt.compareSync(credentials.password, user.password!)) {
           return { id: user.id, name: user.name, email: user.email };
         } else {
           throw new Error('Invalid email or password');

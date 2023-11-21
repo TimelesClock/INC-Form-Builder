@@ -1,11 +1,11 @@
-import { useState, useEffect, use } from 'react';
+import { useState, useEffect } from 'react';
 import Navbar from '../components/Navbar';
 import FormCreationSection from '../components/FormCreationSection';
 import FormsDisplay from '../components/FormsDisplay';
 
-import { useSession, signIn, signOut } from "next-auth/react"
+import { useSession, signIn } from "next-auth/react"
 import { api } from '~/utils/api';
-import { useRouter } from 'next/router';
+
 
 interface Form {
   id: string;
@@ -36,7 +36,6 @@ const Home = () => {
   if (status === 'loading') {
     return <div>Loading...</div>;
   }
-  const router = useRouter();
   if (!session) {
     return (
       <div>

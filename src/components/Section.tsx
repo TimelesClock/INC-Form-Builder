@@ -1,8 +1,6 @@
-import React, { useState, Fragment, useEffect } from 'react';
-import { Listbox, Transition } from '@headlessui/react'
-import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid'
+import React, { useState } from 'react';
 
-import type { Question, Option } from './StaticForm';
+import type { Question } from './StaticForm';
 
 
 
@@ -15,19 +13,18 @@ interface SectionProps {
 
 const Section: React.FC<SectionProps> = ({ question, answer, editMode }) => {
     //prob not the best coding practice
-    let content = null
     const [checked, setChecked] = useState(false)
 
 
-    const handleCheckBoxChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleCheckBoxChange = () => {
         //loop through question.options, check if any of them are checked
         //if they are, set checked to true
         let flag = false
-        let options = document.getElementById(question.id.toString())?.getElementsByTagName("input")
+        const options = document.getElementById(question.id.toString())?.getElementsByTagName("input")
         if (!options) {
             return
         }
-        for (let option of options) {
+        for (const option of options) {
             if (option.checked) {
                 flag = true
                 break
@@ -39,7 +36,7 @@ const Section: React.FC<SectionProps> = ({ question, answer, editMode }) => {
 
     const checkbox: HTMLInputElement = document.getElementById("checkbox" + question.id.toString()) as HTMLInputElement
 
-    checkbox?.addEventListener("invalid", function (event) {
+    checkbox?.addEventListener("invalid", function () {
         checkbox.setCustomValidity("Please select at least one checkbox")
     })
 
@@ -56,7 +53,7 @@ const Section: React.FC<SectionProps> = ({ question, answer, editMode }) => {
                         id={question.id.toString()}
                         className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                         placeholder=""
-                        defaultValue={answer || ""}
+                        defaultValue={answer ?? ""}
                         disabled={editMode}
                         required={question.required}
                     />
@@ -75,7 +72,7 @@ const Section: React.FC<SectionProps> = ({ question, answer, editMode }) => {
                         name={question.id.toString()}
                         id={question.id.toString()}
                         className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                        defaultValue={answer || ""}
+                        defaultValue={answer ?? ""}
                         disabled={editMode}
                         required={question.required}
                     />
@@ -88,25 +85,21 @@ const Section: React.FC<SectionProps> = ({ question, answer, editMode }) => {
                 <label className="block text-sm font-medium leading-6 text-gray-900 mt-5">{question.text}</label>
                 <legend className="sr-only">{question.text}</legend>
                 <div className="relative space-y-5" id={question.id}>
-                    <input key={checked as unknown as React.Key} id={"checkbox" + question.id.toString()} name={"checkbox" + question.id.toString()} type="checkbox" checked={!question.required && checked} onChange={()=>{}} className="opacity-0 absolute left-24 top-0" required={question.required && !checked} />
-                    {question.options?.map((option, index) => {
+                    <input key={checked as unknown as React.Key} id={"checkbox" + question.id.toString()} name={"checkbox" + question.id.toString()} type="checkbox" checked={!question.required && checked} onChange={() => {
+                        //placeholder
+                    }} className="opacity-0 absolute left-24 top-0" required={question.required && !checked} />
+                    {question.options?.map((option) => {
                         let props
                         if (editMode) {
                             props = {
                                 disabled: editMode,
-                                checked: answer?.includes(option.content) || false,
+                                checked: answer?.includes(option.content) ?? false,
                             }
                         } else {
                             props = {
-                                defaultChecked: answer?.includes(option.content) || false,
+                                defaultChecked: answer?.includes(option.content) ?? false,
                             }
                         }
-                        useEffect(() => {
-                            if (answer?.includes(option.content)) {
-                                setChecked(true)
-                            }
-                        }
-                            , [answer])
                         return (
                             <div key={option.id} className="relative flex items-start">
                                 <div className="flex h-6 items-center">
@@ -138,12 +131,14 @@ const Section: React.FC<SectionProps> = ({ question, answer, editMode }) => {
         if (editMode) {
             props = {
                 disabled: editMode,
-                value: answer || "",
-                onChange: () => { }
+                value: answer ?? "",
+                onChange: () => {
+                    //placeholder
+                }
             }
         } else {
             props = {
-                defaultValue: answer || "",
+                defaultValue: answer ?? "",
             }
         }
 
@@ -160,7 +155,7 @@ const Section: React.FC<SectionProps> = ({ question, answer, editMode }) => {
                     {...props}
                 >
                     <option value="" disabled>Select an option</option>
-                    {question.options?.map((option, index) => {
+                    {question.options?.map((option) => {
 
 
                         return (
@@ -176,14 +171,16 @@ const Section: React.FC<SectionProps> = ({ question, answer, editMode }) => {
                 <label className="block text-sm font-medium leading-6 text-gray-900 mt-5">{question.text}</label>
                 <legend className="sr-only">{question.text}</legend>
                 <div className="space-y-5">
-                    {question.options?.map((option, index) => {
+                    {question.options?.map((option) => {
                         //show defaultChecked attribute if editMode isnt true
                         let props
                         if (editMode) {
                             props = {
                                 disabled: editMode,
                                 checked: answer === option.content,
-                                onChange: () => { }
+                                onChange: () => {
+                                    //placeholder
+                                }
                             }
                         } else {
                             props = { defaultChecked: answer === option.content }
@@ -213,7 +210,7 @@ const Section: React.FC<SectionProps> = ({ question, answer, editMode }) => {
                 </div>
             </fieldset>
         )
-    }else if (question.type === "FILE_UPLOAD") {
+    } else if (question.type === "FILE_UPLOAD") {
         return (
             <div>
                 <label htmlFor={question.id.toString()} className="block text-sm font-medium leading-6 text-gray-900">
@@ -226,7 +223,7 @@ const Section: React.FC<SectionProps> = ({ question, answer, editMode }) => {
                         id={question.id.toString()}
                         className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                         placeholder=""
-                        defaultValue={answer || ""}
+                        defaultValue={answer ?? ""}
                         disabled={editMode}
                         required={question.required}
                     />

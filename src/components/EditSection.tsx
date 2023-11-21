@@ -1,8 +1,7 @@
-import React, { useState, Fragment } from 'react';
-import { Listbox, Transition } from '@headlessui/react'
-import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/20/solid'
+import React from 'react';
 
-import type { Question, Option } from './StaticForm';
+
+import type { Question } from './StaticForm';
 
 import useStore from '~/store/useFormStore';
 import { createId } from '@paralleldrive/cuid2'
@@ -17,7 +16,6 @@ interface SectionProps {
 
 const EditSection: React.FC<SectionProps> = ({ question, answer, editMode, focused }) => {
     //prob not the best coding practice
-    let content = null
     const [questions, setQuestions] = useStore((state) => [state.questions, state.setQuestions])
     
     const handleQuestionTypeChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
@@ -25,7 +23,7 @@ const EditSection: React.FC<SectionProps> = ({ question, answer, editMode, focus
 
         if (questionIndex >= 0) { // Ensure the index is found
             // Make a copy of the questions array
-            let newQuestions = [...questions];
+            const newQuestions = [...questions];
 
             // Check if the question object exists at the found index
             const questionToUpdate = newQuestions[questionIndex];
@@ -33,7 +31,7 @@ const EditSection: React.FC<SectionProps> = ({ question, answer, editMode, focus
                 // Update the question's type
                 questionToUpdate.type = event.target.value;
                 //Remove the content of the question unless its changing from CHECKBOXES, MULTIPLE_CHOICE, or DROPDOWN and to one of those
-                let specialCase = ["CHECKBOXES", "MULTIPLE_CHOICE", "DROPDOWN"]
+                const specialCase = ["CHECKBOXES", "MULTIPLE_CHOICE", "DROPDOWN"]
                 if (!specialCase.includes(event.target.value) && specialCase.includes(questionToUpdate.type)) {
                     questionToUpdate.options = []
                 }
@@ -49,7 +47,7 @@ const EditSection: React.FC<SectionProps> = ({ question, answer, editMode, focus
 
         if (questionIndex >= 0) { // Ensure the index is found
             // Make a copy of the questions array
-            let newQuestions = [...questions];
+            const newQuestions = [...questions];
 
             // Check if the question object exists at the found index
             const questionToUpdate = newQuestions[questionIndex];
@@ -68,7 +66,7 @@ const EditSection: React.FC<SectionProps> = ({ question, answer, editMode, focus
 
         if (questionIndex >= 0) { // Ensure the index is found
             // Make a copy of the questions array
-            let newQuestions = [...questions];
+            const newQuestions = [...questions];
 
             // Check if the question object exists at the found index
             const questionToUpdate = newQuestions[questionIndex];
@@ -87,7 +85,7 @@ const EditSection: React.FC<SectionProps> = ({ question, answer, editMode, focus
 
         if (questionIndex >= 0) { // Ensure the index is found
             // Make a copy of the questions array
-            let newQuestions = [...questions];
+            const newQuestions = [...questions];
 
             // Check if the question object exists at the found index
             const questionToUpdate = newQuestions[questionIndex];
@@ -119,7 +117,7 @@ const EditSection: React.FC<SectionProps> = ({ question, answer, editMode, focus
                         id={question.id.toString()}
                         className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                         placeholder=""
-                        defaultValue={answer || ""}
+                        defaultValue={answer ?? ""}
                         disabled={editMode}
                     />
                 </div>
@@ -138,7 +136,7 @@ const EditSection: React.FC<SectionProps> = ({ question, answer, editMode, focus
                         name={question.id.toString()}
                         id={question.id.toString()}
                         className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
-                        defaultValue={answer || ""}
+                        defaultValue={answer ?? ""}
                         disabled={editMode}
                     />
                 </div>
@@ -215,12 +213,6 @@ const EditSection: React.FC<SectionProps> = ({ question, answer, editMode, focus
                 </div>
                 <div className="space-y-5">
                     {question.options?.map((option, index) => {
-                        let props
-                        if (editMode) {
-                            props = { disabled: editMode }
-                        } else {
-                            props = { defaultChecked: answer === option.content }
-                        }
                         return (
                             <div key={option.id} className="relative flex items-center justify-between">
                                 <div className="flex items-center">
@@ -332,7 +324,7 @@ const EditSection: React.FC<SectionProps> = ({ question, answer, editMode, focus
                         id={question.id.toString()}
                         className="block w-full rounded-md border-0 py-1.5 text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:ring-2 focus:ring-inset focus:ring-indigo-600 sm:text-sm sm:leading-6"
                         placeholder=""
-                        defaultValue={answer || ""}
+                        defaultValue={answer ?? ""}
                         disabled={editMode}
                         required={question.required}
                     />

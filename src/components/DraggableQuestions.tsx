@@ -1,5 +1,5 @@
-import React, { useState, FocusEvent } from 'react';
-import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from '@dnd-kit/core';
+import React, { useState,type FocusEvent } from 'react';
+import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, type DragEndEvent } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy, useSortable, } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 import { Switch } from '@headlessui/react'
@@ -8,11 +8,6 @@ import { createId } from '@paralleldrive/cuid2';
 import EditSection from './EditSection';
 import type { Question } from './StaticForm';
 import useStore from '~/store/useFormStore';
-
-interface DraggableQuestionsProps {
-    initialQuestions: Question[];
-}
-
 interface SortableItemProps {
     question: Question;
 
@@ -23,7 +18,7 @@ function classNames(...classes: (string | boolean | undefined)[]) {
 }
 
 const SortableItem: React.FC<SortableItemProps> = ({ question }) => {
-    const { attributes, listeners, setNodeRef, transform, transition, setActivatorNodeRef } = useSortable({ id: question.id.toString() });
+    const { listeners, setNodeRef, transform, transition, setActivatorNodeRef } = useSortable({ id: question.id.toString() });
     const [questions, setQuestions] = useStore((state) => [state.questions, state.setQuestions])
     const [focused, setFocused] = useState<boolean>(false);
     const [enabled, setEnabled] = useState<boolean>(false);
@@ -50,14 +45,14 @@ const SortableItem: React.FC<SortableItemProps> = ({ question }) => {
 
     const handleDeleteSection = () => {
 
-        let newQuestion: Question[] = questions.filter((q) => q.id !== question.id)
+        const newQuestion: Question[] = questions.filter((q) => q.id !== question.id)
         setQuestions(newQuestion)
     }
 
     const handleAddQuestion = () => {
-        let newQuestion: Question[] = [...questions]
-        let index = newQuestion.findIndex((q) => q.id === question.id)
-        let newQ: Question = {
+        const newQuestion: Question[] = [...questions]
+        const index = newQuestion.findIndex((q) => q.id === question.id)
+        const newQ: Question = {
             id: createId(),
             text: "New Question",
             type: "SHORT_ANSWER",
@@ -73,7 +68,7 @@ const SortableItem: React.FC<SortableItemProps> = ({ question }) => {
 
         if (questionIndex >= 0) { // Ensure the index is found
             // Make a copy of the questions array
-            let newQuestions = [...questions];
+            const newQuestions = [...questions];
 
             // Check if the question object exists at the found index
             const questionToUpdate = newQuestions[questionIndex];
@@ -182,9 +177,9 @@ const DraggableQuestions: React.FC = () => {
     const handleDragEnd = (event: DragEndEvent) => {
         const { active, over } = event;
         if (over && active.id !== over.id) {
-            let oldIndex = questions.findIndex((q) => q.id === active.id)
-            let newIndex = questions.findIndex((q) => q.id === over.id)
-            let newQuestions = arrayMove(questions, oldIndex, newIndex)
+            const oldIndex = questions.findIndex((q) => q.id === active.id)
+            const newIndex = questions.findIndex((q) => q.id === over.id)
+            const newQuestions = arrayMove(questions, oldIndex, newIndex)
             setQuestions(newQuestions)
         }
     };

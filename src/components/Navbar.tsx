@@ -1,6 +1,5 @@
 // components/Navbar.tsx
 import { signIn, signOut, useSession } from "next-auth/react";
-import { api } from '~/utils/api';
 
 const Navbar = () => {
   const { data: session } = useSession();

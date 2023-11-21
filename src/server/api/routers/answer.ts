@@ -3,9 +3,8 @@ import { z } from "zod";
 import {
     createTRPCRouter,
     protectedProcedure,
-    publicProcedure,
 } from "~/server/api/trpc";
-import { type JsonObject } from "@prisma/client/runtime/library";
+
 import { type User } from "@prisma/client";
 
 import { TRPCError } from "@trpc/server";
@@ -38,7 +37,7 @@ export const answerRouter = createTRPCRouter({
                     user: true,
                 },
             });
-            let userArray: User[] = []
+            const userArray: User[] = []
             users.forEach((user) => {
                 userArray.push(user.user)
             })
@@ -171,6 +170,6 @@ export const answerRouter = createTRPCRouter({
                     formId: id,
                 },
             });
-            return answers?.content || [];
+            return answers?.content ?? [];
         }),
 });

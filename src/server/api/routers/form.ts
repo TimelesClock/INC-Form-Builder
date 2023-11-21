@@ -3,10 +3,8 @@ import { z } from "zod";
 import {
     createTRPCRouter,
     protectedProcedure,
-    publicProcedure,
 } from "~/server/api/trpc";
 import { type JsonObject } from "@prisma/client/runtime/library";
-import { type User } from "@prisma/client";
 import { type Form } from "@prisma/client";
 
 import { TRPCError } from "@trpc/server";
@@ -26,7 +24,7 @@ export const formRouter = createTRPCRouter({
                     form: true,
                 },
             });
-            let formArray: Form[] = []
+            const formArray: Form[] = []
             forms.forEach((form) => {
                 formArray.push(form.form)
             })
