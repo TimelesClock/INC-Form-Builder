@@ -23,10 +23,10 @@ const TemplateModal: React.FC<TemplateModalProps> = ({ open, setOpen, templates 
 
     const handleCreateForm = () => {
         setOpen(false);
-        createForm({ templateId: selectedTemplate as string },
+        createForm({ templateId: selectedTemplate! },
             {
                 onSuccess: () => {
-                    util.form.getForms.refetch();
+                    void util.form.getForms.refetch();
                 }
             });
     }

@@ -1,12 +1,8 @@
 // pages/forms/[formId].tsx
-import DraggableQuestions from '../../components/DraggableQuestions';
 
-import { useForm } from "react-hook-form"
-import * as z from "zod"
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 
-import StaticForm from '~/components/StaticForm';
 import { api } from '~/utils/api';
 
 import type { Question } from '~/components/StaticForm';
@@ -41,7 +37,7 @@ const FormPage = () => {
 
     const handleSelectUser = (event: React.ChangeEvent<HTMLSelectElement>) => {
 
-        let answer = answerData?.find((answer) => answer.user.id === event.currentTarget.value)
+        const answer = answerData?.find((answer) => answer.user.id === event.currentTarget.value)
         if (answer) {
             setAnswers(answer.content as unknown as Answer[])
         }
@@ -50,14 +46,14 @@ const FormPage = () => {
     return (
         <>
             
-            <button onClick={() => router.push("/edit/" + router.query.formId)} className="bg-blue-500 text-white p-2 rounded">
+            <button onClick={() => router.push("/edit/" + router.query.formId?.toString())} className="bg-blue-500 text-white p-2 rounded">
                 Back
             </button>
             <div className="container mx-auto p-4">
                 Select the user to view their responses:
                 <select defaultValue="" onChange={handleSelectUser} className="my-5 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-600 focus:border-indigo-600 sm:text-sm rounded-md">
                     <option value="" disabled>Select a user</option>
-                    {users?.map((user, index) => {
+                    {users?.map((user) => {
                         return (
                             <>
                                 <option key={user.id} value={user.id}>{user.email}</option>
@@ -67,15 +63,15 @@ const FormPage = () => {
                 </select>
                 <h1 className="text-xl font-bold mb-4">Form Questions</h1>
                 {questions.map((question, index) => {
-                    let answer = answers?.find((answer) => answer.id === question.id);
+                    const answer = answers?.find((answer) => answer.id === question.id);
                     let content
-                    if (answer && answer.content) {
+                    if (answer?.content) {
                         content = answer.content
                     }
                     
 
                     return (
-                        <Section key={index} question={question as Question} answer={content} editMode={true} />
+                        <Section key={index} question={question } answer={content} editMode={true} />
                     )
                 }
                 )}

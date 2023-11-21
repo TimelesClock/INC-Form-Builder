@@ -1,6 +1,5 @@
 // pages/forms/[formId].tsx
 import { useEffect, useState } from "react"
-import { set, useForm } from "react-hook-form"
 import { useRouter } from 'next/router';
 import { api } from "~/utils/api"
 import toast from "react-hot-toast";
@@ -25,18 +24,18 @@ const FormPage = () => {
 
 
     const handleClick = () => {
-        updateQuestions({ id: router.query.formId as string, questions: questions as Question[] }, {
+        updateQuestions({ id: router.query.formId as string, questions: questions  }, {
             onSuccess: () => {
-                let title = document.getElementById("title") as HTMLInputElement
-                let description = document.getElementById("description") as HTMLInputElement
+                const title = document.getElementById("title") as HTMLInputElement
+                const description = document.getElementById("description") as HTMLInputElement
                 updateForm({
                     id: router.query.formId as string,
                     name: title.value,
-                    description: description.value as string
+                    description: description.value 
                 }, {
                     onSuccess: () => {
                         toast.success("Form saved!")
-                        router.push("/")
+                        void router.push("/")
                     }
                 })
             }
@@ -45,9 +44,9 @@ const FormPage = () => {
 
     const handleCreateTemplate = () => {
         createTemplate({
-            name: form?.title as string,
-            description: form?.description as string,
-            content: questions as Question[]
+            name: form?.title ?? "",
+            description: form?.description ?? "",
+            content: questions 
         }, {
             onSuccess: () => {
                 toast.success("Template created!")
@@ -59,11 +58,11 @@ const FormPage = () => {
         if (form) {
             setQuestions(form.question as unknown as Question[])
         }
-    }, [form])
+    }, [form, setQuestions])
 
     return (
         <>
-            <button onClick={() => { router.push("/") }} className="bg-blue-500 text-white p-2 rounded">Back</button>
+            <button onClick={() => { void router.push("/") }} className="bg-blue-500 text-white p-2 rounded">Back</button>
             <InviteModal open={open} setOpen={setOpen} />
             <nav className="flex justify-center space-x-5 p-4 bg-gray-200">
 
@@ -71,7 +70,7 @@ const FormPage = () => {
                     <button onClick={handleCreateTemplate} className="bg-green-500 text-white p-2 rounded">Create Template</button>
                 </div>
                 <div>
-                    <button onClick={() => { router.push("/responses/" + form?.id) }} className="bg-blue-500 text-white p-2 rounded">Responses</button>
+                    <button onClick={() => { void router.push("/responses/" + form?.id) }} className="bg-blue-500 text-white p-2 rounded">Responses</button>
                 </div>
                 <div>
                     <button onClick={()=>{setOpen(true)}} className="bg-blue-500 text-white p-2 rounded">Invite people</button>
@@ -81,7 +80,7 @@ const FormPage = () => {
                 <div className="bg-white px-6 py-12 sm:py-16 lg:px-8 flex justify-center">
                     <div className="justify-center align-center flex flex-col max-w-2xl text-center">
                         <input id="title" name="title" type="text" defaultValue={form?.title} className="mt-2 text-2xl font-bold tracking-tight text-center border-none text-gray-900 sm:text-6xl" />
-                        <input id="description" name="description" type="text" defaultValue={form?.description as string} className="mt-6 text-lg text-center border-none leading-8 text-gray-600" />
+                        <input id="description" name="description" type="text" defaultValue={form?.description ?? ""} className="mt-6 text-lg text-center border-none leading-8 text-gray-600" />
                     </div>
                 </div>
                 <DraggableQuestions />

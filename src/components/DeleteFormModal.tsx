@@ -1,8 +1,8 @@
-import { Fragment, useState, type Dispatch, type SetStateAction } from "react";
+import { Fragment, type Dispatch, type SetStateAction } from "react";
 import { Dialog, Transition } from "@headlessui/react";
-import { CheckIcon, TrashIcon } from "@heroicons/react/24/outline";
+import { TrashIcon } from "@heroicons/react/24/outline";
 import { api } from "~/utils/api";
-import { useRouter } from "next/router";
+
 
 
 interface DeleteFormModalProps {
@@ -19,12 +19,12 @@ export default function DeleteFormModal({
 }: DeleteFormModalProps) {
 
   const util = api.useUtils()
-  const {mutate: deleteForm} = api.form.deleteForm.useMutation();
+  const { mutate: deleteForm } = api.form.deleteForm.useMutation();
 
   const handleDeleteForm = () => {
-    deleteForm({id: formId}, {
+    deleteForm({ id: formId }, {
       onSuccess: () => {
-        util.form.getForms.refetch();
+        void util.form.getForms.refetch();
       }
     });
     setDeleteModal(false);

@@ -1,11 +1,10 @@
-import { Fragment, useEffect, useRef, useState } from 'react';
+import { Fragment, useRef } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
-import type { FormTemplate } from '@prisma/client';
+
 import { api } from '~/utils/api';
 import { useRouter } from 'next/router';
 
-import type { User } from '@prisma/client'
-import { set } from 'zod';
+
 import { toast } from 'react-hot-toast';
 
 interface InviteModalProps {
@@ -52,7 +51,7 @@ const InviteModal: React.FC<InviteModalProps> = ({ open, setOpen }) => {
     //     }
     // }
 
-    const handleSendInvitation = async () => {
+    const handleSendInvitation = () => {
         //send invitation to the user specified in the input
         //check if email valid
         const email = (document.getElementById("email") as HTMLInputElement).value
