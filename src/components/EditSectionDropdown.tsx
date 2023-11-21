@@ -17,6 +17,7 @@ const EditSectionDropdown: React.FC<EditSectionDropdownProps> = ({
                     <option value="MULTIPLE_CHOICE">Multiple Choice</option>
                     <option value="CHECKBOXES">Checkboxes</option>
                     <option value="DROPDOWN">Dropdown</option>
+                    <option value="FILE_UPLOAD">File Upload</option>
                 </select>
             </div>
         </div>
