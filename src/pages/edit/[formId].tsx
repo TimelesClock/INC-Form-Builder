@@ -14,8 +14,8 @@ const FormPage = () => {
     const router = useRouter()
 
     const [questions, setQuestions] = useStore((state) => [state.questions, state.setQuestions])
-    
-    const [open , setOpen] = useState(false)
+
+    const [open, setOpen] = useState(false)
 
     const { data: form } = api.form.getForm.useQuery({ id: router.query.formId as string }, { enabled: !!router.query.formId });
     const { mutate: updateQuestions } = api.form.updateQuestions.useMutation();
@@ -24,14 +24,14 @@ const FormPage = () => {
 
 
     const handleClick = () => {
-        updateQuestions({ id: router.query.formId as string, questions: questions  }, {
+        updateQuestions({ id: router.query.formId as string, questions: questions }, {
             onSuccess: () => {
                 const title = document.getElementById("title") as HTMLInputElement
                 const description = document.getElementById("description") as HTMLInputElement
                 updateForm({
                     id: router.query.formId as string,
                     name: title.value,
-                    description: description.value 
+                    description: description.value
                 }, {
                     onSuccess: () => {
                         toast.success("Form saved!")
@@ -46,7 +46,7 @@ const FormPage = () => {
         createTemplate({
             name: form?.title ?? "",
             description: form?.description ?? "",
-            content: questions 
+            content: questions
         }, {
             onSuccess: () => {
                 toast.success("Template created!")
@@ -62,10 +62,10 @@ const FormPage = () => {
 
     return (
         <>
-            <button onClick={() => { void router.push("/") }} className="bg-blue-500 text-white p-2 rounded">Back</button>
+
             <InviteModal open={open} setOpen={setOpen} />
             <nav className="flex justify-center space-x-5 p-4 bg-gray-200">
-
+                <button onClick={() => { void router.push("/") }} className="absolute top-1 left-1 bg-blue-500 text-white p-2 rounded">Back</button>
                 <div>
                     <button onClick={handleCreateTemplate} className="bg-green-500 text-white p-2 rounded">Create Template</button>
                 </div>
@@ -73,7 +73,7 @@ const FormPage = () => {
                     <button onClick={() => { void router.push("/responses/" + form?.id) }} className="bg-blue-500 text-white p-2 rounded">Responses</button>
                 </div>
                 <div>
-                    <button onClick={()=>{setOpen(true)}} className="bg-blue-500 text-white p-2 rounded">Invite people</button>
+                    <button onClick={() => { setOpen(true) }} className="bg-blue-500 text-white p-2 rounded">Invite people</button>
                 </div>
             </nav>
             <div className="container p-4 ">

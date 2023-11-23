@@ -8,7 +8,7 @@ const Navbar = () => {
 
   return (
     <nav className="flex justify-between p-4 bg-gray-200">
-      <div className="logo">Logo</div>
+      <div className="logo">INC Form Builder</div>
       <div>
         {session ? (
           <button onClick={() => signOut()} className="text-red-500">Logout</button>

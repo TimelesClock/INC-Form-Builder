@@ -5,8 +5,8 @@ import { CSS } from '@dnd-kit/utilities';
 import { Switch } from '@headlessui/react'
 import { createId } from '@paralleldrive/cuid2';
 
-import EditSection from './EditSection';
-import type { Question } from './StaticForm';
+import EditSection from './edit_sections/EditSection';
+import type { Question } from '~/types/question';;
 import useStore from '~/store/useFormStore';
 interface SortableItemProps {
     question: Question;

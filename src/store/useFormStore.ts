@@ -1,5 +1,5 @@
 import { create } from "zustand";
-import type { Question } from '~/components/StaticForm';
+import type { Question } from '~/types/question';
 
 interface StoreState {
     questions: Question[],

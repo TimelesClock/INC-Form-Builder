@@ -3,7 +3,7 @@ import { Dialog, Transition } from '@headlessui/react';
 import type { FormTemplate } from '@prisma/client';
 import { api } from '~/utils/api';
 
-interface TemplateModalProps {
+export interface TemplateModalProps {
     open: boolean;
     setOpen: (open: boolean) => void;
     templates: FormTemplate[];

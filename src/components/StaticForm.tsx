@@ -1,12 +1,15 @@
 import React from 'react';
 
-import Section from './Section';
+import Section from './sections/Section';
 import type { JsonArray, JsonObject } from '@prisma/client/runtime/library';
 
 import { api } from '~/utils/api';
+import uploadToS3 from '~/utils/s3Upload';
+import deleteFromS3 from '~/utils/s3Delete';
 
 import { useRouter } from 'next/router';
 import toast from 'react-hot-toast';
+
 
 
 export interface Question {
@@ -38,7 +41,7 @@ const StaticForm: React.FC<StaticFormProps> = ({ questions, answers }) => {
 
     const { mutate: addAnswer } = api.answer.addAnswer.useMutation();
 
-    const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
 
         // Initialize an object to hold the parsed form data
@@ -48,7 +51,7 @@ const StaticForm: React.FC<StaticFormProps> = ({ questions, answers }) => {
         for (const element of event.currentTarget.elements) {
             const input = element as HTMLInputElement;
 
-            if (input.nodeName !== "INPUT" && input.nodeName !== "TEXTAREA" && input.nodeName !== "SELECT" ) {
+            if (input.nodeName !== "INPUT" && input.nodeName !== "TEXTAREA" && input.nodeName !== "SELECT") {
                 continue;
             }
             //if the input id starts with checkbox continue
@@ -72,6 +75,66 @@ const StaticForm: React.FC<StaticFormProps> = ({ questions, answers }) => {
                     jsonData[input.name] = input.value;
                 }
             }
+            // Check if the element is a file
+            else if (input.type === "file") {
+                const file = input.files?.[0];
+                if (file) {
+                    const fileName = file.name;
+                    const folderName = router.query.formId as string;
+                    const mimeType = file.type; // MIME type of the file
+
+                    // Convert file to a buffer
+                    const readFileAsBuffer = (file:File) => {
+                        return new Promise((resolve, reject) => {
+                            const reader = new FileReader();
+                            reader.onload = () => {
+                                const result = reader.result;
+                                if (result instanceof ArrayBuffer) {
+                                    resolve(Buffer.from(result));
+                                } else {
+                                    reject(new Error("Failed to read file as ArrayBuffer"));
+                                }
+                            };
+                            reader.onerror = () => reject(reader.error);
+                            reader.readAsArrayBuffer(file);
+                        });
+                    };
+                    
+
+                    try {
+                        const fileBuffer = await readFileAsBuffer(file);
+
+                        //First delete the old file
+                        const oldFileUrl = document.getElementById("file"+input.id)?.innerHTML
+                        if(oldFileUrl){
+                            await deleteFromS3(oldFileUrl)
+                        }
+
+                        const fileUrl = await uploadToS3(
+                            process.env.NEXT_PUBLIC_AWS_BUCKET_NAME!,
+                            `${folderName}/${input.id}/${fileName}`,
+                            fileBuffer as Buffer,
+                            mimeType,
+                            fileName
+                        );
+                        
+                        jsonData[input.name] = fileUrl;
+                        
+                    } catch (error) {
+                        console.error('Error reading file:', error);
+                        toast.error("Error uploading file")
+                        return
+                    }
+                }else{
+                    //get the file url from the span
+                    const fileUrl = document.getElementById("file"+input.id)?.innerHTML
+                    if(fileUrl){
+                        jsonData[input.name] = fileUrl
+                    }
+                }
+
+
+            }
             // Handle other input types
             else {
                 jsonData[input.name] = input.value;
@@ -81,7 +144,7 @@ const StaticForm: React.FC<StaticFormProps> = ({ questions, answers }) => {
         // Format the jsonData into {id:string, content:string | string[]}[]
         const answers = [];
         for (const key in jsonData) {
-            answers.push({ id: key, content: jsonData[key] as string[] | string});
+            answers.push({ id: key, content: jsonData[key] as string[] | string });
         }
 
         // Add the answers to the database
@@ -103,7 +166,7 @@ const StaticForm: React.FC<StaticFormProps> = ({ questions, answers }) => {
                 <div className="border border-black p-4 my-2 grid">
                     {questions.map((question, index) => {
                         const answer = answers?.find((answer) => answer.id === question.id);
-                        let content 
+                        let content
                         if (answer?.content) {
                             content = answer.content
                         }

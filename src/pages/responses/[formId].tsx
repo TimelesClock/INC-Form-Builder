@@ -8,7 +8,7 @@ import { api } from '~/utils/api';
 import type { Question } from '~/components/StaticForm';
 import type { Answer } from '~/components/StaticForm';
 import type { User } from '@prisma/client'
-import Section from '~/components/Section';
+import Section from '~/components/sections/Section';
 
 
 const FormPage = () => {

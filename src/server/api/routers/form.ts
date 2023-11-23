@@ -4,6 +4,8 @@ import {
     createTRPCRouter,
     protectedProcedure,
 } from "~/server/api/trpc";
+import { createId } from "@paralleldrive/cuid2";
+
 import { type JsonObject } from "@prisma/client/runtime/library";
 import { type Form } from "@prisma/client";
 
@@ -174,7 +176,12 @@ export const formRouter = createTRPCRouter({
                     title: name,
                     description: description,
                     ownerId: ctx.session.user.id,
-                    question: [],
+                    question: [{
+                        id: createId(),
+                        text: "Untitled Question",
+                        type: "shortAnswer",
+                        required: false,
+                    }],
                 },
             });
             return form;
