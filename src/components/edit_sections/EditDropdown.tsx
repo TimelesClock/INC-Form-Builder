@@ -42,7 +42,7 @@ const EditDropdown: React.FC<EditDropdownProps> = ({ question, focused, handleQu
                     )
                 })}
 
-                {focused && (question?.options?.length !== 1) && (
+                {focused && (
                     <div className="relative flex items-start" style={{ opacity: '0.5' }} >
                         <div className="flex h-6 items-center">
 

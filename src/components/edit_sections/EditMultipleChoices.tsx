@@ -56,7 +56,7 @@ const EditMultipleChoice: React.FC<EditMultipleChoiceProps> = ({ question, answe
                         </div>
                     )
                 })}
-                {focused && (question?.options?.length !== 1) && (
+                {focused && (
                     <div className="relative flex items-start" style={{ opacity: '0.5' }} >
                         <div className="flex h-6 items-center">
                             <input
