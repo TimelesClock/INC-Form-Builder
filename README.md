@@ -11,7 +11,6 @@ This dynamic form builder was built with the T3 Stack [Create T3 App](https://cr
 - S3 Bucket (File uploads)
 - Zustand (For global state management)
 
-
 ## Geting started
 
 1. Clone this repository using
@@ -19,9 +18,9 @@ This dynamic form builder was built with the T3 Stack [Create T3 App](https://cr
    ```bash
    git clone https://github.com/timelesclock/inc-form-builder
    ```
-   Or use the hosted version on
-   [https://github.com/TimelesClock/INC-Form-Builder/](https://github.com/TimelesClock/INC-Form-Builder/)
 
+   Or use the hosted version on
+   [https://inc-form-builder.vercel.app/](https://inc-form-builder.vercel.app/)
 2. Copy the .env.example folder into .env
 
    ```bash
@@ -40,7 +39,8 @@ This dynamic form builder was built with the T3 Stack [Create T3 App](https://cr
    ```bash
    npm run dev
    ```
+
 ## Usage
 
 A user can create a form and send invitations to other user's through emails. Currently the invitation feature requires the email to be a registered user.
-The invited user can then fill up the form and the form owner can see the responses of the form.
+The invited user can then fill up the form and the form owner can see the responses of
