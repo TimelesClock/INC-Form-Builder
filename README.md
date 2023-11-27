@@ -1,28 +1,46 @@
-# Create T3 App
+## Introduction
 
-This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app`.
+This dynamic form builder was built with the T3 Stack [Create T3 App](https://create.t3.gg/) and the following libraries
 
-## What's next? How do I make an app with this?
+- Next.js
+- TypeScript
+- tRPC
+- Prisma
+- TailwindCSS
+- Next-auth (Authentication)
+- S3 Bucket (File uploads)
+- Zustand (For global state management)
 
-We try to keep this project as simple as possible, so you can start with just the scaffolding we set up for you, and add additional things later when they become necessary.
 
-If you are not familiar with the different technologies used in this project, please refer to the respective docs. If you still are in the wind, please join our [Discord](https://t3.gg/discord) and ask for help.
+## Geting started
 
-- [Next.js](https://nextjs.org)
-- [NextAuth.js](https://next-auth.js.org)
-- [Prisma](https://prisma.io)
-- [Tailwind CSS](https://tailwindcss.com)
-- [tRPC](https://trpc.io)
+1. Clone this repository using
 
-## Learn More
+   ```bash
+   git clone https://github.com/timelesclock/inc-form-builder
+   ```
+   Or use the hosted version on
+   [https://github.com/TimelesClock/INC-Form-Builder/](https://github.com/TimelesClock/INC-Form-Builder/)
 
-To learn more about the [T3 Stack](https://create.t3.gg/), take a look at the following resources:
+2. Copy the .env.example folder into .env
 
-- [Documentation](https://create.t3.gg/)
-- [Learn the T3 Stack](https://create.t3.gg/en/faq#what-learning-resources-are-currently-available) — Check out these awesome tutorials
+   ```bash
+   cp .env.example .env
+   ```
+3. Fill up the .env with the api keys listed in the .env, database url must be cockroachDB
+4. Run the following commands to install dependencies and initialise the database
 
-You can check out the [create-t3-app GitHub repository](https://github.com/t3-oss/create-t3-app) — your feedback and contributions are welcome!
+   ```bash
+   npm install
+   npx prisma generate
+   npx prisma migrate dev
+   ```
+5. Finally, run the following command to open the local development server on `http://localhost:3000`
 
-## How do I deploy this?
+   ```bash
+   npm run dev
+   ```
+## Usage
 
-Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/vercel), [Netlify](https://create.t3.gg/en/deployment/netlify) and [Docker](https://create.t3.gg/en/deployment/docker) for more information.
+A user can create a form and send invitations to other user's through emails. Currently the invitation feature requires the email to be a registered user.
+The invited user can then fill up the form and the form owner can see the responses of the form.
